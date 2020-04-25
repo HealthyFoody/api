@@ -8,12 +8,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/customer")
 public class CustomerController {
 	
 	@GetMapping("/get/{id}") 
-	Customer findByID(@PathVariable Long id) {
+	Customer findByID(@PathVariable UUID id) {
 		return null;
 	}
 	
@@ -28,7 +30,7 @@ public class CustomerController {
 	}
 	
 	@PutMapping("delete/{id}")
-	Boolean deactivateCustomer(@PathVariable Long id) {
+	Boolean deactivateCustomer(@PathVariable UUID id) {
 		return false;
 	}
 	

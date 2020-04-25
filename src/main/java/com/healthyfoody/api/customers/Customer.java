@@ -1,18 +1,25 @@
 package com.healthyfoody.api.customers;
 
-import java.util.List;
-
 import javax.persistence.*;
 
-import com.healthyfoody.api.address.Address;
+import com.healthyfoody.api.users.UserAccount;
+import com.healthyfoody.api.common.BaseEntity;
+import com.healthyfoody.api.common.TableName;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
-public class Customer {
-	@Id Long id;
+@Table(name = TableName.CUSTOMER)
+public class Customer extends BaseEntity {
 	
 	String firstName;
-	String lastName;
-	String email;
 	
-	List<Address> addresses;
+	String lastName;
+	
+	@OneToOne(fetch = FetchType.LAZY, optional = true)
+	@JoinColumn(name = "user_id",unique = true, nullable = true)
+    UserAccount user;
 }
