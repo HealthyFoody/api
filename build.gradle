@@ -34,24 +34,27 @@ ext {
 }
 
 dependencies {
+	// implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-hateoas'
 
-	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	runtimeOnly 'org.postgresql:postgresql'
+	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+
+	runtime 'mysql:mysql-connector-java'
+	runtimeOnly 'org.postgresql:postgresql'
+
 
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
 	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
-	testImplementation 'com.github.javafaker:javafaker:1.0.2'
-	
-	implementation 'org.geotools:gt-shapefile:23.0'
+	// testImplementation 'com.github.javafaker:javafaker:1.0.2'
+
+	// implementation 'org.geotools:gt-shapefile:23.0'
 
 	implementation 'com.github.culqi:culqi-java:v1.1.9'
-
 
 }
 

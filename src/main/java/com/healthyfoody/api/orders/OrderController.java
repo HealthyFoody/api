@@ -54,31 +54,36 @@ public class OrderController {
 	@PostMapping("/post")
 	public ResponseEntity<?> placeOrder(@Valid @RequestBody OrderForm form){
 
+		System.out.println(form.getCustomerId());
+
+		System.out.println("GAAAAAAAAAAAAAA");
+
 		Order order = new Order();
-		Customer customer = customerService.findById(form.customerId)
+		Customer customer = customerService.findById(form.getCustomerId())
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"Cliente no existe"));
+
 		List<OrderDetail> details = new ArrayList<>();
 
-		Store store = storeService.findById(form.storeId)
+		Store store = storeService.findById(form.getStoreId())
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sede no valida"));
 
-		form.products.stream().map(item -> {
+		form.getProducts().stream().map(item -> {
 			OrderDetail detail = new OrderDetail();
 
 			detail.setOrder(order);
 
-			detail.setProduct(productService.findById(item.product).orElse(null));
-			detail.setQuantity(item.quantity);
+			detail.setProduct(productService.findById(item.getProductId()).orElse(null));
+			detail.setQuantity(item.getQuantity());
 
-			if (item.combo != null){
+			if (item.getComboId() != null){
 
-				Combo combo	= (Combo) productService.findTypedById(item.combo, ProductType.COMBO)
+				Combo combo	= (Combo) productService.findTypedById(item.getComboId(), ProductType.COMBO)
 						.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "No es un combo"));
 
 				// confirma que el plato forma parte del combo
 				if (productService.isPartOfCombo(detail.getProduct().getId(), combo.getId())) {
 					detail.setCombo(combo);
-					detail.setBundledQuantity(item.bundledQuantity);
+					detail.setBundledQuantity(item.getBundledQuantity());
 				}
 			}
 
@@ -87,10 +92,14 @@ public class OrderController {
 
 		order.setCustomer(customer);
 		order.setOrderDate(LocalDateTime.now());
-		order.setProgrammedFor(ConverterUtil.toLocalDateTime(form.programedFor));
+
 		order.setStore(store);
 		order.setOrderDetails(details);
+
+		LocalDateTime programmedDate = ConverterUtil.toLocalDateTime(form.getProgramedFor());
+
 		order.setOrderDate(LocalDateTime.now());
+		order.setProgrammedFor(programmedDate == null ? order.getOrderDate(): programmedDate);
 
 
 		UUID orderId = orderService.placeOrder(order);

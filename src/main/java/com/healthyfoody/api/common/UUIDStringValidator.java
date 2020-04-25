@@ -16,6 +16,10 @@ public class UUIDStringValidator {
 
         @Override
         public boolean isValid(String value, ConstraintValidatorContext context) {
+            System.out.println("VALIDAAAAA");
+            System.out.println(value);
+            System.out.println("==========");
+
             return value.matches(this.regex);
         }
 

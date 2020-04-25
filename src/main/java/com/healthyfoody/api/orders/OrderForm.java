@@ -1,21 +1,27 @@
 package com.healthyfoody.api.orders;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.healthyfoody.api.common.ValidUUID;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
+@Getter
+@Setter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OrderForm {
 
     @ValidUUID
-    UUID customerId;
+    private UUID customerId;
 
     @ValidUUID
-    UUID storeId;
+    private UUID storeId;
 
-    String programedFor;
+    private String programedFor;
 
     @Valid
-    List<OrderDetailForm> products;
+    private List<OrderDetailForm> products;
 }

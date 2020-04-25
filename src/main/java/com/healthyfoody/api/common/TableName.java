@@ -23,7 +23,7 @@ public class TableName {
 	public final static String MEAL = "meals";
 	public final static String COMBO = "combos";
 	public final static String COMBO_GROUP_MEAL = "combo_group_meals";
-	public final static String GROUP = "groups";
+	public final static String GROUP = "meal_groups";
 	
 	public final static String SALE_TIME_SPAN = "sale_time_spans";
 	

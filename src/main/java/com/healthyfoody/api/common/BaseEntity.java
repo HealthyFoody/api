@@ -17,7 +17,7 @@ import lombok.Setter;
 public abstract class BaseEntity {
 	@Id
 	@ValidUUID
-	@Type(type = "pg-uuid")
+	@Type(type = "uuid-char")
 	@Column(updatable = false, nullable = false)
 	protected UUID id;
 	
