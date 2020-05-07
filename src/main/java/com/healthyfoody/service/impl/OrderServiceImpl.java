@@ -141,12 +141,12 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public void cancelOrder(UUID id, boolean exceptional) {
-
+		throw new UnsupportedOperationException("Not implemented");
 	}
 
 	@Override
 	public void updateStatus(UUID id, OrderStatus newStatus) {
-
+		throw new UnsupportedOperationException("Not implemented");
 	}
 
 	@Override

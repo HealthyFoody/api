@@ -9,14 +9,15 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 @Configuration
 @EnableRedisRepositories(basePackages = "com.healthyfoody.repository.redis")
 public class RedisConfiguration {
-    @Bean
-    public LettuceConnectionFactory redisConnectionFactory() {
-        return new LettuceConnectionFactory();
-    }
-    @Bean
-    public RedisTemplate<?, ?> redisTemplate() {
-        RedisTemplate<byte[], byte[]> template = new RedisTemplate<>();
-        template.setConnectionFactory(redisConnectionFactory());
-        return template;
-    }
+	@Bean
+	public LettuceConnectionFactory redisConnectionFactory() {
+		return new LettuceConnectionFactory();
+	}
+
+	@Bean
+	public RedisTemplate<byte[], byte[]> redisTemplate() {
+		RedisTemplate<byte[], byte[]> template = new RedisTemplate<>();
+		template.setConnectionFactory(redisConnectionFactory());
+		return template;
+	}
 }

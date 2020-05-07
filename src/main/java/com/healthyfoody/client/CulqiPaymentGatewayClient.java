@@ -14,16 +14,20 @@ import com.healthyfoody.entity.Order;
 @Component
 public class CulqiPaymentGatewayClient implements PaymentGatewayClient, CardStorageClient {
 
-	public static String PUBLIC_KEY = "pk_test_yp7aPFwTcm0jcQel";
+	@Value("${culqi-public-key}")
+	private String publicKey;
 
 	@Value("${culqi-secret-key}")
-	public static String SECRET_KEY;
+	private String secretKey;
+
+	public CulqiPaymentGatewayClient() {
+		Culqi.public_key = publicKey;
+		Culqi.secret_key = secretKey;
+	}
 
 	@Override
 	public Map<String, Object> makePayment(Order order, Map<String, Object> token) throws Exception {
 		Culqi culqi = new Culqi();
-		Culqi.public_key = PUBLIC_KEY;
-		Culqi.secret_key = SECRET_KEY;
 
 		Map<String, Object> charge = new HashMap<>();
 		Map<String, Object> antifraudDetails = new HashMap<String, Object>();
