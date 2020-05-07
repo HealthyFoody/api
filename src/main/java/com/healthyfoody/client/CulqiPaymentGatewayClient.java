@@ -14,10 +14,10 @@ import com.healthyfoody.entity.Order;
 @Component
 public class CulqiPaymentGatewayClient implements PaymentGatewayClient, CardStorageClient {
 
-	@Value("${culqi-public-key}")
+	@Value("${culqi.public-key}")
 	private String publicKey;
 
-	@Value("${culqi-secret-key}")
+	@Value("${culqi.secret-key}")
 	private String secretKey;
 
 	public CulqiPaymentGatewayClient() {
