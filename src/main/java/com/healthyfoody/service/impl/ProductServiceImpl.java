@@ -82,35 +82,21 @@ public class ProductServiceImpl implements ProductService {
 			errors.add(e.getMessage());
 			return errors;
 		}
+		if (product == null)return errors;
 
-		if (checkListed) {
-			if (!isListed(product)) {
-				errors.add("El producto seleccionado no se encuentra a la venta");
-				return errors;
-			}
+		if (checkListed && !product.getListed()) {
+			errors.add("El producto seleccionado no se encuentra a la venta");
+			return errors;
 		}
 
-		if (storeId != null) {
-			if (!isInStock(storeId, product.getId()))
-				errors.add("El producto seleccionado se ha agotado en esa tienda");
+		if (storeId != null && !isInStock(storeId, product.getId())) {
+			errors.add("El producto seleccionado se ha agotado en esa tienda");
 		}
 
-		if (hour != null) {
-			if (!isOnSaleAtHour(product.getId(), hour))
-				errors.add("Está fuera del horario de venta del producto seleccionado");
+		if (hour != null && !isOnSaleAtHour(product.getId(), hour)) {
+			errors.add("Está fuera del horario de venta del producto seleccionado");
 		}
 		return errors;
-	}
-
-	private Boolean isListed(Product product) {
-		if (product != null) {
-			if (product.getListed() != null)
-				return !product.getListed();
-			else {
-				return productRepository.findById(product.getId()).map(x -> !x.getListed()).orElse(false);
-			}
-		}
-		return false;
 	}
 
 	@Override
@@ -136,7 +122,7 @@ public class ProductServiceImpl implements ProductService {
 
 			boolean isOptional = mealGroup.getOptional();
 
-			if (isOptional && matches > 2)
+			if (isOptional && matches > 1)
 				return false;
 			if (!isOptional && matches != 1)
 				return false;

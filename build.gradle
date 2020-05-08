@@ -28,6 +28,13 @@ jacoco {
 	toolVersion = '0.8.5'
 }
 
+sonarqube {
+	properties{
+		property 'sonar.coverage.exclusions', "src/main/java/com/healthyfoody/dto/**,src/main/java/com/healthyfoody/entity/**,src/main/java/com/healthyfoody/repository/**"
+	}
+}
+
+
 repositories {
 	maven {
 		url 'https://repo.osgeo.org/repository/release/'
