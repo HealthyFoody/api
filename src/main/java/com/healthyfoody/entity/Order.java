@@ -1,6 +1,7 @@
 package com.healthyfoody.entity;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -62,6 +63,7 @@ public class Order extends BaseEntity {
 	@NotNull
 	private LocalDateTime programmedFor;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "order", orphanRemoval = true, cascade = CascadeType.ALL)
 	private List<Tracking> tracking;
 

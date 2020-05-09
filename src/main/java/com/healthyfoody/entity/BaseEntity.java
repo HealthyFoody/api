@@ -1,5 +1,6 @@
 package com.healthyfoody.entity;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
@@ -14,6 +15,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @MappedSuperclass
+@EqualsAndHashCode
 public abstract class BaseEntity {
     @Id
     @ValidUUID

@@ -2,7 +2,9 @@ package com.healthyfoody;
 
 import com.healthyfoody.service.impl.OrderServiceImpl;
 import com.healthyfoody.service.impl.ProductServiceImpl;
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
@@ -21,4 +23,8 @@ public class OrderTests {
         MockitoAnnotations.initMocks(this);
     }
 
+    @Test
+    public void nothing(){
+        Assert.assertEquals(true,true);
+    }
 }

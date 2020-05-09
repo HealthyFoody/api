@@ -52,7 +52,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-
+	implementation 'com.voodoodyne.jackson.jsog:jackson-jsog:1.1.1'
 	implementation 'org.springframework.boot:spring-boot-starter-hateoas'
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
