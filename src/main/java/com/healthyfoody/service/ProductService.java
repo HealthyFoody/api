@@ -15,12 +15,4 @@ public interface ProductService extends CrudService<Product, UUID> {
     Product findTypedById(UUID id, ProductType type) throws ResourceNotFoundException;
 
     List<MealGroup> loadComboDetail(UUID comboId, Boolean verifyExpired) throws ResourceNotFoundException;
-
-    List<String> validationReport(UUID productId, boolean checkListed, UUID storeId, LocalTime hour);
-
-    Boolean isInStock(UUID storeId, UUID productId) throws ResourceNotFoundException;
-
-    Boolean isOnSaleAtHour(UUID productId, LocalTime hour) throws ResourceNotFoundException;
-
-    Boolean validateCombination(UUID comboId, List<UUID> productsIds);
 }

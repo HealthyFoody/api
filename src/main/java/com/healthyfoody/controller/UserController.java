@@ -46,19 +46,11 @@ public class UserController {
 	@PostMapping("/login")
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody UserRequest authenticationRequest) throws Exception {
 
-		System.out.println("GAAAA");
-
 		authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
 
 		UserAccount user = userService.findByEmail(authenticationRequest.getEmail());
 
-		final UserDetails userDetails = userService
-				.loadUserByUsername(user.getEmail());
-
-		Map<String, Object> claims = new HashMap<>();
-		claims.put("userId", user.getId());
-
-		final String token = jwtTokenUtil.generateToken(userDetails, claims);
+		final String token = jwtTokenUtil.generateToken(user);
 
 		return ResponseEntity.ok(new AuthResponse(token));
 	}
