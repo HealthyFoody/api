@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.function.Function;
 
 import com.healthyfoody.entity.UserAccount;
+import com.healthyfoody.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -21,6 +23,9 @@ public class JwtTokenUtil implements Serializable {
 	private static final long serialVersionUID = -2550185165626007488L;
 
 	public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
+
+	@Autowired
+	UserService userService;
 
 	@Value("${jwt.secret}")
 	private String secret;
@@ -51,14 +56,14 @@ public class JwtTokenUtil implements Serializable {
 	}
 
 	//generate token for user
-	public String generateToken(UserDetails userDetails) {
-		Map<String, Object> claims = new HashMap<>();
-		return doGenerateToken(claims, userDetails.getUsername());
-	}
+	public String generateToken(UserAccount user) {
 
-	public String generateToken(UserDetails userDetails, Map<String, Object> claims) {
-		if (claims == null)
-			claims = new HashMap<>();
+		final UserDetails userDetails = userService
+				.loadUserByUsername(user.getEmail());
+
+		Map<String, Object> claims = new HashMap<>();
+		claims.put("userId", user.getId());
+
 		return doGenerateToken(claims, userDetails.getUsername());
 	}
 

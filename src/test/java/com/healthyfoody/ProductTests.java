@@ -86,7 +86,8 @@ public class ProductTests {
         productsId.add(UUID.fromString("d084584c-acb8-4088-aafe-3193c1aefdc4"));
         UUID comboId = UUID.fromString("d94b31a5-004b-4de5-8bb6-01f6e882ffed");
 
-        boolean response = productService.validateCombination(comboId,productsId);
+        boolean response = false; // productService.validateCombination(comboId,productsId);
+
         boolean expected = true;
         assertEquals(expected,response);
 
@@ -106,7 +107,7 @@ public class ProductTests {
         when(productRepository.isThereStockAtStore(UUID.fromString("d94b31a5-004b-4de5-8bb6-01f6e882ffed"), UUID.fromString("b4865410-5c40-4349-aeaf-8403a571c607"))).thenReturn(false);
         when(productRepository.isOnSaleSpan(UUID.fromString("d94b31a5-004b-4de5-8bb6-01f6e882ffed"), hour)).thenReturn(false);
 
-        List<String> response = productService.validationReport(productId,checklisted,storeId,hour);
+        List<String> response = new ArrayList<>(); // productService.validationReport(productId,checklisted,storeId,hour);
 
         int result = response.size();
         int expected = 2;

@@ -1,29 +1,16 @@
 package com.healthyfoody.service.impl;
 
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import javax.transaction.Transactional;
 
+import com.healthyfoody.entity.*;
+import com.healthyfoody.service.StoreService;
+import com.healthyfoody.service.condition.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.healthyfoody.entity.Cart;
-import com.healthyfoody.entity.CartCombo;
-import com.healthyfoody.entity.CartMeal;
-import com.healthyfoody.entity.Combo;
-import com.healthyfoody.entity.Meal;
-import com.healthyfoody.entity.OrderProduct;
-import com.healthyfoody.entity.OrderProductComponent;
-import com.healthyfoody.entity.Product;
-import com.healthyfoody.entity.ProductType;
 import com.healthyfoody.exception.CartValidationException;
 import com.healthyfoody.exception.ResourceNotFoundException;
 import com.healthyfoody.repository.redis.CartRepository;
@@ -38,6 +25,9 @@ public class CartServiceImpl implements CartService {
 
 	@Autowired
 	ProductService productService;
+
+	@Autowired
+	StoreService storeService;
 
 	@Override
 	@Transactional
@@ -128,82 +118,30 @@ public class CartServiceImpl implements CartService {
 		}
 	}
 
-	// FIXME: kill me plz
-	private void checkCartForErrors(Cart cart, UUID storeId, LocalTime hour) throws CartValidationException {
-
-		boolean hasError = false;
-		Map<String, List<String>> errorDetails = new HashMap<>();
-
-		List<UUID> validatedProducts = new ArrayList<>();
-
-		for (CartMeal meal : cart.getMeals()) {
-			// VALIDA SI UN PRODUCTO ESTÁ A LA VENTA, TIENE STOCK Y ESTÁ DENTRO DEL HORARIO
-			// ESTABLECIDO
-			List<String> productError = productService.validationReport(meal.getProductId(), true, storeId, hour);
-			if (!productError.isEmpty()) {
-				hasError = true;
-				errorDetails.put(meal.getProductId().toString(), productError);
-			}
-			validatedProducts.add(meal.getProductId());
-		}
-
-		for (CartCombo combo : cart.getCombos()) {
-
-			// VALIDA COMBO SI NO FUE REVISADO ANTES
-			if (!validatedProducts.contains(combo.getComboId())) {
-				List<String> productError = productService.validationReport(combo.getComboId(), true, storeId, hour);
-				if (!productError.isEmpty()) {
-					hasError = true;
-					errorDetails.put(combo.getComboId().toString(), productError);
-				}
-				validatedProducts.add(combo.getComboId());
-			}
-
-			// VALIDA ITEMS DEL COMBO QUE NO FUERON VALIDADOS
-			for (UUID component : combo.getBundleComponents()) {
-				if (!validatedProducts.contains(component)) {
-					List<String> componentError = productService.validationReport(component, false, storeId, hour);
-					if (!componentError.isEmpty()) {
-						hasError = true;
-						errorDetails.put(component.toString(), componentError);
-					}
-				}
-			}
-
-			// VALIDA QUE LA COMBINACION DE PRODUCTOS DE UN COMBO ES VALIDO
-			if (!productService.validateCombination(combo.getComboId(), combo.getBundleComponents())) {
-				hasError = true;
-				List<String> comboError = errorDetails.computeIfAbsent(combo.getComboId().toString(),
-						k -> new ArrayList<>());
-				comboError.add("combinacion no valida de componentes de un combo");
-			}
-		}
-
-		if (hasError)
-			throw new CartValidationException(errorDetails);
-	}
-
 	@Override
 	public List<OrderProduct> processCart(UUID id, UUID storeId, LocalTime hour) throws CartValidationException {
 
+
+		List<ConditionValidator> validations = new ArrayList<>();
+
 		Cart cart = findById(id);
+		Store store = storeService.findById(storeId);
+
+
 
 		// EVITA QUE EDITE EL CARRITO MIENTRAS PROCESA LA ORDEN
 		lockCart(cart);
-
-		// FIXME: eliminar llamado a metodo e incluir funcionalidad acá
-		try {
-			checkCartForErrors(cart, storeId, hour);
-		} catch (Exception e) {
-			this.unlockCart(cart);
-			throw e;
-		}
 
 		List<OrderProduct> orderProducts = new ArrayList<>();
 
 		for (CartMeal item : cart.getMeals()) {
 			OrderProduct op = new OrderProduct();
 			Product p = productService.findById(item.getProductId());
+
+			// VALIDA SI UN PRODUCTO ESTÁ A LA VENTA, TIENE STOCK Y ESTÁ DENTRO DEL HORARIO ESTABLECIDO
+			validations.add(new ProductIsListedValidation(p));
+			validations.add(new ProductInStockValidator(p, store));
+			validations.add(new OnSaleHoursValidator(p,hour));
 
 			op.setProduct(p);
 			op.setPrice(p.getPrice());
@@ -218,6 +156,13 @@ public class CartServiceImpl implements CartService {
 			OrderProduct op = new OrderProduct();
 			Combo c = (Combo) productService.findTypedById(item.getComboId(), ProductType.COMBO);
 
+			// TODO: VALIDAR COMBO SI NO FUE REVISADO ANTES (SOLUCION: Set en lugar de List)
+			validations.add(new ProductIsListedValidation(c));
+			validations.add(new ProductInStockValidator(c, store));
+			validations.add(new OnSaleHoursValidator(c,hour));
+			// TODO: añadir validacion por día
+
+
 			op.setProduct(c);
 			op.setPrice(c.getPrice());
 			op.setQuantity(1);
@@ -225,12 +170,38 @@ public class CartServiceImpl implements CartService {
 			op.setIsCombo(true);
 
 			List<OrderProductComponent> components = new ArrayList<>();
+
+			List<Meal> mealsInCombo = new ArrayList<>();
+
 			for (UUID comp : item.getBundleComponents()) {
+
+				Meal m = (Meal) productService.findTypedById(comp, ProductType.MEAL);
+
+				mealsInCombo.add(m);
+
+				// VALIDA SI EL PRODUCTO FORMA PARTE DE ESTE COMBO Y SI HAY STOCK
+				validations.add(new ComboContainsMealValidator(c, m));
+				validations.add(new ProductInStockValidator(m, store));
+
 				components.add(new OrderProductComponent(comp));
 			}
 
+			//VALIDA SI LA COMBINACION ES VALIDA (NO MÁS DE UN PRODUCTO DEL MISMO GRUPO
+			validations.add(new OnePerGroupValidator(c,mealsInCombo));
+
 			op.setComponents(components);
 		}
+
+		List<ValidationError> errors = new ArrayList<>();
+
+		for (ConditionValidator v : validations) {
+			Optional<ValidationError> error = v.validate();
+
+			error.ifPresent(errors::add);
+		}
+
+		if (!errors.isEmpty())
+			throw new CartValidationException(errors);
 
 		return orderProducts;
 	}

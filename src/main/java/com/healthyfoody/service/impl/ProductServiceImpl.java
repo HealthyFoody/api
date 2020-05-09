@@ -70,65 +70,6 @@ public class ProductServiceImpl implements ProductService {
 		return combo.getMealGroups();
 	}
 
-	@Override
-	public List<String> validationReport(UUID productId, boolean checkListed, UUID storeId, LocalTime hour) {
-
-		Product product = null;
-		List<String> errors = new ArrayList<>();
-
-		try {
-			product = findById(productId);
-		} catch (RuntimeException e) {
-			errors.add(e.getMessage());
-			return errors;
-		}
-		if (product == null)return errors;
-
-		if (checkListed && !product.getListed()) {
-			errors.add("El producto seleccionado no se encuentra a la venta");
-			return errors;
-		}
-
-		if (storeId != null && !isInStock(storeId, product.getId())) {
-			errors.add("El producto seleccionado se ha agotado en esa tienda");
-		}
-
-		if (hour != null && !isOnSaleAtHour(product.getId(), hour)) {
-			errors.add("Está fuera del horario de venta del producto seleccionado");
-		}
-		return errors;
-	}
-
-	@Override
-	public Boolean isInStock(UUID storeId, UUID productId) {
-		return productRepository.isThereStockAtStore(productId, storeId);
-	}
-
-	@Override
-	public Boolean isOnSaleAtHour(UUID productId, LocalTime hour) {
-		return productRepository.isOnSaleSpan(productId, hour);
-	}
-
-	@Override
-	public Boolean validateCombination(UUID comboId, List<UUID> productsIds) {
-
-		Combo combo = (Combo) productRepository.findById(comboId).orElse(null);
-
-		if (combo == null)
-			return false;
-
-		for (MealGroup mealGroup : combo.getMealGroups()) {
-			long matches = mealGroup.getMeals().stream().filter(meal -> productsIds.contains(meal.getId())).count();
-
-			boolean isOptional = mealGroup.getOptional();
-
-			if (isOptional && matches > 1)
-				return false;
-			if (!isOptional && matches != 1)
-				return false;
-		}
-		return true;
-	}
 
 	@Override
 	public Product findById(UUID id) throws ResourceNotFoundException {
