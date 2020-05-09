@@ -37,4 +37,9 @@ public class CustomerServiceImpl implements CustomerService {
                 .orElseThrow(() -> new ResourceNotFoundException(id, UserAccount.class));
     }
 
+    @Transactional
+    @Override
+    public Customer insert(Customer customer){
+        return customerRepository.save(customer);
+    }
 }

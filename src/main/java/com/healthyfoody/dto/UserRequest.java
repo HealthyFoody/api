@@ -21,4 +21,10 @@ public class UserRequest implements Serializable {
 	@NotEmpty
 	@Size(min = 5)
 	private String password;
+
+	@NotEmpty
+	private String firstName;
+	@NotEmpty
+	private String lastName;
+
 }

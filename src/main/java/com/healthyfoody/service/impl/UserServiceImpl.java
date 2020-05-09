@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import com.healthyfoody.entity.AccountStatus;
+import com.healthyfoody.entity.Role;
 import com.healthyfoody.exception.EmailExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
@@ -38,8 +40,13 @@ public class UserServiceImpl implements UserService {
 		UserAccount aux = new UserAccount();
 		aux.setEmail(user.getEmail());
 		aux.setPassword(passwordEncoder.encode(user.getPassword()));
+		aux.setEmailValidated(true);
+		aux.setStatusCode(AccountStatus.ACTIVE);
 		aux.setRegisteredOn(LocalDateTime.now());
-		aux.setRole(user.getRole());
+		Role role = new Role();
+		role.setId(2);
+
+		aux.setRole(role);
 
 		return userRepository.save(aux);
 	}
