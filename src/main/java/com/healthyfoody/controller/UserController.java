@@ -3,6 +3,7 @@ package com.healthyfoody.controller;
 import com.healthyfoody.config.JwtTokenUtil;
 import com.healthyfoody.dto.UserRequest;
 import com.healthyfoody.dto.AuthResponse;
+import com.healthyfoody.entity.Customer;
 import com.healthyfoody.entity.UserAccount;
 import com.healthyfoody.mapper.UserMapper;
 import com.healthyfoody.service.CustomerService;
@@ -24,7 +25,7 @@ import java.util.UUID;
 
 @CrossOrigin
 @RestController
-@RequestMapping("users/")
+@RequestMapping("/users")
 public class UserController {
 
 	@Autowired
@@ -64,8 +65,19 @@ public class UserController {
 	
 	@PostMapping("/register")
 	public ResponseEntity<?> saveUser(@RequestBody @Valid UserRequest user) throws Exception {
-
-		return ResponseEntity.ok(userService.register(userMapper.requestToEntity(user)));
+		UserAccount userSaved = userService.register(userMapper.requestToEntity(user));
+		if(userSaved.getId() !=  null){
+			Customer customer = new  Customer();
+			customer.setFirstName(user.getFirstName());
+			customer.setLastName(user.getLastName());
+			customer.setUser(userSaved);
+			Customer insert = customerService.insert(customer);
+		}
+		return ResponseEntity.ok(userMapper.entityToResponse(userSaved));
+	}
+	@PostMapping("/customer/register")
+	public ResponseEntity<?> saveCustomer(@RequestBody @Valid Customer customer){
+		return ResponseEntity.ok(customerService.insert(customer));
 	}
 
 	private void authenticate(String email, String password) throws Exception {
@@ -80,7 +92,7 @@ public class UserController {
 
 	@GetMapping("/customer/{id}")
 	public ResponseEntity<?> getCustomerById(@RequestParam @ValidUUID String id) {
-		UserAccount user = new UserAccount();
+		UserAccount user = userService.findById(UUID.fromString(id));
 		return ResponseEntity.ok(customerService.findCustomerByUser(user));
 	}
 }
