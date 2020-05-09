@@ -1,9 +1,10 @@
 package com.healthyfoody.entity;
 
-import com.healthyfoody.validation.ValidUUID;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
+
+import com.healthyfoody.validation.annotations.ValidUUID;
 
 import javax.persistence.Column;
 import javax.persistence.Id;

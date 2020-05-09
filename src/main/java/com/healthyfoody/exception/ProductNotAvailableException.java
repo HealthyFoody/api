@@ -11,7 +11,5 @@ public class ProductNotAvailableException extends RuntimeException {
 
     public ProductNotAvailableException(UUID id) {
         super("Producto no disponible");
-
-
     }
 }

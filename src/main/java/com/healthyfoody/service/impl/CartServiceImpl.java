@@ -52,7 +52,7 @@ public class CartServiceImpl implements CartService {
 
 	@Override
 	@Transactional
-	public void addToCart(UUID id, UUID productId, int quantityOrInstance, UUID[] components, boolean override) {
+	public void addToCart(UUID id, UUID productId, int quantityOrInstance, List<UUID> components, boolean override) {
 		Cart cart = checkCart(id);
 
 		// FIXME: replace assert statement
@@ -71,9 +71,9 @@ public class CartServiceImpl implements CartService {
 		if (product instanceof Combo) {
 
 			// FIXME: replace assert statement
-			assert components.length > 0 : "Error al agregar el combo";
+			assert components.size() > 0 : "Error al agregar el combo";
 
-			CartCombo combo = new CartCombo(productId, quantityOrInstance, Arrays.asList(components));
+			CartCombo combo = new CartCombo(productId, quantityOrInstance, components);
 			Set<CartCombo> combos = cart.getCombos();
 
 			if (override)
@@ -113,21 +113,19 @@ public class CartServiceImpl implements CartService {
 	}
 
 	@Override
-	public Cart lockCart(Cart cart) {
+	public void lockCart(Cart cart) {
 		if (cart.getMutable()) {
 			cart.setMutable(false);
 			cart = cartRepository.save(cart);
 		}
-		return cart;
 	}
 
 	@Override
-	public Cart unlockCart(Cart cart) {
+	public void unlockCart(Cart cart) {
 		if (!cart.getMutable()) {
 			cart.setMutable(true);
 			cart = cartRepository.save(cart);
 		}
-		return cart;
 	}
 
 	// FIXME: kill me plz
@@ -191,13 +189,13 @@ public class CartServiceImpl implements CartService {
 		Cart cart = findById(id);
 
 		// EVITA QUE EDITE EL CARRITO MIENTRAS PROCESA LA ORDEN
-		cart = lockCart(cart);
+		lockCart(cart);
 
 		// FIXME: eliminar llamado a metodo e incluir funcionalidad acá
 		try {
 			checkCartForErrors(cart, storeId, hour);
 		} catch (Exception e) {
-			unlockCart(cart);
+			this.unlockCart(cart);
 			throw e;
 		}
 

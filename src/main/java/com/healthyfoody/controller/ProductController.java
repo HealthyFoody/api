@@ -2,7 +2,8 @@ package com.healthyfoody.controller;
 
 import com.healthyfoody.service.CategoryService;
 import com.healthyfoody.service.ProductService;
-import com.healthyfoody.validation.ValidUUID;
+import com.healthyfoody.validation.annotations.ValidUUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;

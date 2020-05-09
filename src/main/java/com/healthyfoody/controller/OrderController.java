@@ -1,6 +1,10 @@
 package com.healthyfoody.controller;
 
-import com.healthyfoody.dto.OrderForm;
+import com.healthyfoody.dto.OrderRequest;
+import com.healthyfoody.mapper.OrderMapper;
+import com.healthyfoody.service.OrderService;
+import com.healthyfoody.validation.annotations.ValidUUID;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,35 +15,29 @@ import java.util.UUID;
 @RequestMapping("/orders")
 public class OrderController {
 
-	@GetMapping("/get")
+	@Autowired
+	OrderMapper orderMapper;
+
+	@Autowired
+	OrderService orderService;
+
+	@GetMapping("/invoice")
 	public ResponseEntity<?> getAllCustomerOrder(@Valid @RequestParam("customer") UUID customerId, @RequestParam(defaultValue = "0") Integer page){
 
-		//TODO: implement controller method
-		return null;
+		return ResponseEntity.ok(orderService.findCustomerOrders(customerId, page, 15));
 	}
 
-	@GetMapping("/get/{id}")
+	@GetMapping("/invoice/{id}")
 	public ResponseEntity<?> getOrderById(@Valid @PathVariable("id") UUID id){
 
-		//TODO: implement controller method
-		return null;
+		return ResponseEntity.ok(orderService.findById(id));
 	}
 
-	@PostMapping(Endpoint.PLACE_ORDER)
-	public ResponseEntity<?> placeOrder(@Valid @RequestBody OrderForm form){
+	@PostMapping("/place/{cartId}")
+	public ResponseEntity<?> placeOrder(
+			@PathVariable @ValidUUID String cartId,
+			@Valid @RequestBody OrderRequest form){
 
-		//TODO: implement controller method
-		return null;
-	}
-
-	@PutMapping("/put")
-	public ResponseEntity<?> modifyOrder(@Valid @RequestBody OrderForm form){
-
-		//TODO: implement controller method
-		return null;
-	}
-
-	private static class Endpoint {
-		public static final String PLACE_ORDER = "/post";
+		return ResponseEntity.ok(orderService.placeOrder(UUID.fromString(cartId), orderMapper.requestToEntity(form), form. getType()));
 	}
 }

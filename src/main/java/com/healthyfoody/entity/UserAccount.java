@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -42,9 +43,8 @@ public class UserAccount extends BaseEntity {
 	Boolean emailValidated;
 
 	@NotNull
-	Integer statusCode;
-
-	String name;
+	@Enumerated
+	AccountStatus statusCode;
 
 	@NotNull
 	LocalDateTime registeredOn;

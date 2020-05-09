@@ -12,15 +12,15 @@ public interface CartService extends CrudService<Cart, UUID> {
 
     Object createCart(UUID customerId);
 
-    void addToCart(UUID id, UUID productId, int quantityOrInstance, UUID[] components, boolean override);
+    void addToCart(UUID id, UUID productId, int quantityOrInstance, List<UUID> components, boolean override);
 
     void deleteFromCart(UUID id, UUID productId, Integer instance);
 
     void clearCart(UUID id);
 
-    Cart lockCart(Cart cart);
+    void lockCart(Cart cart);
 
-    Cart unlockCart(Cart cart);
+    void unlockCart(Cart cart);
 
     List<OrderProduct> processCart(UUID id, UUID storeId, LocalTime hour) throws CartValidationException;
 }

@@ -1,7 +1,8 @@
 package com.healthyfoody.controller;
 
 import com.healthyfoody.entity.Address;
-import com.healthyfoody.validation.ValidUUID;
+import com.healthyfoody.validation.annotations.ValidUUID;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

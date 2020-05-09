@@ -2,12 +2,12 @@ package com.healthyfoody.exception;
 
 import java.util.Map;
 
-public class CartValidationException extends RuntimeException {
+public class CartValidationException extends BusinessException {
 
-	private Map<String, ?> report;
+	private Map<String, ?> errors;
 
-	public CartValidationException(Map<String, ?> report) {
+	public CartValidationException(Map<String, ?> errors) {
 		super("Error al validar los productos del carrito");
-		this.report = report;
+		this.errors = errors;
 	}
 }

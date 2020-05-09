@@ -18,14 +18,11 @@ import java.util.UUID;
 
 import javax.transaction.Transactional;
 
+import com.healthyfoody.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import com.healthyfoody.entity.Order;
-import com.healthyfoody.entity.OrderStatus;
-import com.healthyfoody.entity.PaymentType;
-import com.healthyfoody.entity.Tracking;
 import com.healthyfoody.exception.ResourceNotFoundException;
 import com.healthyfoody.repository.jpa.OrderRepository;
 import com.healthyfoody.service.CartService;
@@ -64,6 +61,7 @@ public class OrderServiceImpl implements OrderService {
 		Order order = new Order();
 
 		// TODO: Validate customer and store
+
 		// VALIDA DIRECCION
 		storeService.inRangeOfStore(request.getStore().getId(), request.getLatitude(), request.getLongitude());
 
