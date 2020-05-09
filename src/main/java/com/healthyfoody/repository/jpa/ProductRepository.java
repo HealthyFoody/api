@@ -13,13 +13,13 @@ import java.util.UUID;
 
 public interface ProductRepository extends JpaRepository<Product, UUID> {
 
-    @Query("select distinct p from Product p join p.categories cat where cat.id = :categoryId and p.listed = false ")
+    @Query("select distinct p from Product p join p.categories cat where cat.id = :categoryId and p.listed = true ")
     Page<Product> findAllFromCategory(UUID categoryId, Pageable pageable);
 
-    @Query("select s.inStock from Stock s where s.product.id = :productId and s.store.id = :storeId and s.product.listed = false ")
+    @Query("select s.inStock from Stock s where s.product.id = :productId and s.store.id = :storeId and s.product.listed = true ")
     Boolean isThereStockAtStore(UUID productId, UUID storeId);
 
-    @Query("select case when count(p) > 0 then true else false end from Product p where p.id = :productId and p.saleTimeSpan.endingHour > :hour and p.listed = false ")
+    @Query("select case when count(p) > 0 then true else false end from Product p where p.id = :productId and p.saleTimeSpan.endingHour > :hour and p.listed = true ")
     Boolean isOnSaleSpan(UUID productId, LocalTime hour);
 
     @Query("select g from MealGroup g join g.meals m where m.id = :mealId and g.combo.id = :comboId ")

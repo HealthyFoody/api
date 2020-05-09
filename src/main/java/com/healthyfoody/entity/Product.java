@@ -1,9 +1,7 @@
 package com.healthyfoody.entity;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
+import com.voodoodyne.jackson.jsog.JSOGGenerator;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,7 +15,6 @@ import java.util.List;
 @Entity
 @Table(name = TableName.PRODUCT)
 @Inheritance(strategy = InheritanceType.JOINED)
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @JsonTypeInfo(
 		use = JsonTypeInfo.Id.NAME,
 		property = "type")
@@ -33,6 +30,7 @@ public abstract class Product extends BaseEntity {
 	@NotNull
 	String description;
 
+	@JsonIgnore
 	@ManyToMany(mappedBy = "products")
 	List<Category> categories;
 

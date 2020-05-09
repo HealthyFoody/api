@@ -34,7 +34,7 @@ public class ProductController {
 			@RequestParam(required = false, defaultValue = "0") Integer page,
 			@RequestParam(required = false, defaultValue = "10") Integer size) {
 
-		return ResponseEntity.ok(productService.findAllByCategory(UUID.fromString(categoryId), page, size));
+		return ResponseEntity.ok(productService.findAllByCategory(UUID.fromString(categoryId), page, size).getContent());
 	}
 
 	@GetMapping("products/{id}/combo")

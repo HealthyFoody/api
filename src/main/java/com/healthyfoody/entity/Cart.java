@@ -1,5 +1,6 @@
 package com.healthyfoody.entity;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.redis.core.RedisHash;
@@ -12,6 +13,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @RedisHash("cart")
+@EqualsAndHashCode
 public class Cart{
 
     @Id

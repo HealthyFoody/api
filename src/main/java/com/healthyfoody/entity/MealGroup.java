@@ -1,5 +1,6 @@
 package com.healthyfoody.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.List;
 @Table(name = TableName.MEAL_GROUP, uniqueConstraints = @UniqueConstraint(columnNames = { "combo_id", "name" }))
 public class MealGroup extends BaseEntity {
 
+	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "combo_id")
 	Combo combo;

@@ -1,5 +1,8 @@
 package com.healthyfoody.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.voodoodyne.jackson.jsog.JSOGGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +22,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = TableName.CATEGORY)
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+
 public class Category extends BaseEntity {
 
     @NotNull
@@ -27,7 +30,7 @@ public class Category extends BaseEntity {
     String name;
 
     String description;
-
+    @JsonIgnore
     @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(name = TableName.CATEGORY_PRODUCT,
             joinColumns = {@JoinColumn(name = "category_id")},
