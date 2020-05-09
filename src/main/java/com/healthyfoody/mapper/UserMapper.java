@@ -12,5 +12,6 @@ public interface UserMapper {
     @Mapping(target = "password", constant = "*****")
     UserResponse entityToResponse(UserAccount user);
 
+
     UserAccount requestToEntity(UserRequest dto);
 }
