@@ -1,15 +1,17 @@
 package com.healthyfoody.controller;
 
-import com.healthyfoody.dto.OrderRequest;
-import com.healthyfoody.mapper.OrderMapper;
-import com.healthyfoody.service.OrderService;
-import com.healthyfoody.validation.annotations.ValidUUID;
+import java.util.UUID;
+
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import java.util.UUID;
+import com.healthyfoody.dto.request.OrderRequest;
+import com.healthyfoody.mapper.OrderMapper;
+import com.healthyfoody.service.OrderService;
+import com.healthyfoody.validation.annotations.GUID;
 
 @RestController
 @RequestMapping("/orders")
@@ -35,9 +37,9 @@ public class OrderController {
 
 	@PostMapping("/place/{cartId}")
 	public ResponseEntity<?> placeOrder(
-			@PathVariable @ValidUUID String cartId,
+			@PathVariable @GUID String cartId,
 			@Valid @RequestBody OrderRequest form){
-
-		return ResponseEntity.ok(orderService.placeOrder(UUID.fromString(cartId), orderMapper.requestToEntity(form), form. getType()));
+		//TODO: FIX
+		return ResponseEntity.ok(null);
 	}
 }

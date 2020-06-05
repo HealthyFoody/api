@@ -1,67 +1,90 @@
 package com.healthyfoody.service.impl;
 
-import com.healthyfoody.entity.Address;
-import com.healthyfoody.exception.ResourceNotFoundException;
-import com.healthyfoody.repository.jpa.AddressRepository;
-import com.healthyfoody.service.AddressService;
+import java.util.List;
+import java.util.UUID;
+
+import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
-import java.util.List;
-import java.util.UUID;
+import com.healthyfoody.dto.request.AddressRequest;
+import com.healthyfoody.dto.response.AddressResponse;
+import com.healthyfoody.entity.Address;
+import com.healthyfoody.exception.ResourceNotFoundException;
+import com.healthyfoody.mapper.AddressMapper;
+import com.healthyfoody.repository.jpa.AddressRepository;
+import com.healthyfoody.service.AddressService;
 
 @Service
 public class AddressServiceImpl implements AddressService {
 
     @Autowired
     AddressRepository addressRepository;
+    
+    @Autowired
+    AddressMapper addressMapper;
 
     @Override
-    public List<Address> findByCustomer(UUID customerId) {
-        return addressRepository.findByCustomerId(customerId);
+    public List<AddressResponse> findByCustomer(UUID customerId) {
+        List<Address> addressList = addressRepository.findByCustomerId(customerId);
+        return addressMapper.mapResponseList(addressList);
     }
 
     @Override
-    public Address findDefaultAddress(UUID customerId) {
-        return addressRepository.findByCustomerId(customerId).stream()
-                .filter(x -> x.getDefaultAddress())
+    public AddressResponse findDefaultAddress(UUID customerId) {
+        Address address = addressRepository.findByCustomerId(customerId).stream()
+                .filter(x -> x.getIsDefault())
                 .findFirst().orElse(null);
+        return addressMapper.toResponse(address);
     }
 
     @Override
     @Transactional
     public void makeDefaultAddress(UUID id) throws ResourceNotFoundException {
-        Address address = addressRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id, Address.class));
+        Address address = findEntityById(id);
         addressRepository.removeDefaultAddress(address.getCustomer().getId());
-        address.setDefaultAddress(true);
+        address.setIsDefault(true);
         addressRepository.save(address);
     }
 
     @Override
-    public Address findById(UUID id) throws ResourceNotFoundException {
-        return addressRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id, Address.class));
+    public AddressResponse findById(UUID id) throws ResourceNotFoundException {
+        Address address = findEntityById(id);
+        return addressMapper.toResponse(address);
     }
 
-    @Override
-    public Address insert(Address entity) {
-        return addressRepository.save(entity);
-    }
 
-    @Override
     @Transactional
-    public Address update(Address entity) {
-        Address oldAddress = findById(entity.getId());
-
-        oldAddress.setName(entity.getName());
-
-        return addressRepository.save(entity);
-    }
-
-    @Override
-    @Transactional
-    public void delete(UUID id) {
+    public void deleteEntity(UUID id) {
         addressRepository.deleteById(id);
     }
+
+	@Override
+	public Address findEntityById(UUID id) throws ResourceNotFoundException {
+		return addressRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id, Address.class));
+	}
+
+	@Override
+	public AddressResponse insert(AddressRequest request) {
+		
+		Address address = addressMapper.toEntity(request);
+		
+		Address result = addressRepository.save(address);
+		return addressMapper.toResponse(result);
+	}
+
+	@Override
+	public AddressResponse update(AddressRequest request, UUID id) {
+		Address address = findEntityById(id);
+		addressMapper.updateEntity(request, address);
+		
+		Address result = addressRepository.save(address);
+		return addressMapper.toResponse(result);
+	}
+
+	@Override
+	public void delete(UUID id) {
+		addressRepository.deleteById(id);
+	}
 }

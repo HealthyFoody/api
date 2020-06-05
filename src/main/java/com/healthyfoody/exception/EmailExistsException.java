@@ -2,7 +2,7 @@ package com.healthyfoody.exception;
 
 public class EmailExistsException extends BusinessException {
 
-    public EmailExistsException() {
-        super("El email ingresado ya existe");
+    public EmailExistsException(String email) {
+        super("Ya existe una cuenta registrada con el email " + email);
     }
 }

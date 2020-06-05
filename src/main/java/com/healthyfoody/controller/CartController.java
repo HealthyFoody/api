@@ -1,21 +1,22 @@
 package com.healthyfoody.controller;
 
-import com.healthyfoody.dto.CartActionRequest;
-import com.healthyfoody.entity.Combo;
-import com.healthyfoody.service.CartService;
-import com.healthyfoody.util.UuidUtil;
-import com.healthyfoody.validation.annotations.ValidUUID;
-import com.healthyfoody.validation.groups.ComboItem;
-import com.healthyfoody.validation.groups.MealItem;
+import java.util.UUID;
+
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import com.healthyfoody.dto.request.CartItemRequest;
+import com.healthyfoody.entity.Combo;
+import com.healthyfoody.service.CartService;
+import com.healthyfoody.validation.annotations.GUID;
+import com.healthyfoody.validation.groups.ProductGroups.OnCombos;
+import com.healthyfoody.validation.groups.ProductGroups.OnMeals;
 
+@Validated
 @RestController
 @RequestMapping("/cart")
 public class CartController {
@@ -25,21 +26,21 @@ public class CartController {
 
     @GetMapping("/")
     public ResponseEntity<?> requestCart(
-            @ValidUUID @RequestParam(name = "customer", required = false) String customerId) {
-        return ResponseEntity.ok(cartService.createCart(UUID.fromString(customerId)));
+            @GUID @RequestParam(name = "customer", required = false) String customerId) {
+        return ResponseEntity.ok(cartService.obtainCustomerCart(UUID.fromString(customerId)));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getCartById(
-            @PathVariable @ValidUUID String id) {
+            @PathVariable @GUID String id) {
         return ResponseEntity.ok(cartService.findById(UUID.fromString(id)));
     }
 
     @PostMapping("/{id}/meal/")
-    @Validated({ MealItem.class })
+    @Validated({ OnMeals.class })
     public ResponseEntity<?> addMealToCart(
-            @PathVariable @ValidUUID String id,
-            @RequestBody @Valid CartActionRequest mealRequest) {
+            @PathVariable @GUID String id,
+            @RequestBody @Valid CartItemRequest mealRequest) {
         cartService.addToCart(UUID.fromString(id),
                 mealRequest.getProductId(),
                 mealRequest.getQuantity(),null,false );
@@ -49,21 +50,21 @@ public class CartController {
     @PostMapping("/{id}/combo")
     @Validated({ Combo.class })
     public ResponseEntity<?> addComboToCart(
-            @PathVariable @ValidUUID String id,
-            @RequestBody @Valid CartActionRequest comboRequest) {
+            @PathVariable @GUID String id,
+            @RequestBody @Valid CartItemRequest comboRequest) {
         cartService.addToCart(UUID.fromString(id),
                 comboRequest.getProductId(),
                 comboRequest.getInstance(),
-                comboRequest.getComponents().stream().map(UuidUtil.Wrapper::value).collect(Collectors.toList()),
+                comboRequest.getComponents(),
                 false );
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}/meal")
-    @Validated({ MealItem.class })
+    @Validated({ OnMeals.class })
     public ResponseEntity<?> editMealInCart(
-            @PathVariable @ValidUUID String id,
-            @RequestBody @Valid CartActionRequest mealRequest) {
+            @PathVariable @GUID String id,
+            @RequestBody @Valid CartItemRequest mealRequest) {
         cartService.addToCart(UUID.fromString(id),
                 mealRequest.getProductId(),
                 mealRequest.getQuantity(),null,true);
@@ -71,22 +72,22 @@ public class CartController {
     }
 
     @PutMapping("/{id}/combo")
-    @Validated({ ComboItem.class })
+    @Validated({ OnCombos.class })
     public ResponseEntity<?> editComboInCart(
-            @PathVariable @ValidUUID String id,
-            @RequestBody @Valid CartActionRequest comboRequest) {
+            @PathVariable @GUID String id,
+            @RequestBody @Valid CartItemRequest comboRequest) {
         cartService.addToCart(UUID.fromString(id),
                 comboRequest.getProductId(),
                 comboRequest.getInstance(),
-                comboRequest.getComponents().stream().map(UuidUtil.Wrapper::value).collect(Collectors.toList()),
+                comboRequest.getComponents(),
                 true );
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}/remove")
     public ResponseEntity<?> removeItemFromCart(
-            @PathVariable @ValidUUID String id,
-            @RequestBody @Valid CartActionRequest request) {
+            @PathVariable @GUID String id,
+            @RequestBody @Valid CartItemRequest request) {
         cartService.deleteFromCart(UUID.fromString(id),
                 request.getProductId(), request.getInstance());
         return ResponseEntity.ok().build();
@@ -94,7 +95,7 @@ public class CartController {
 
     @DeleteMapping("/{id}/clear")
     public ResponseEntity<?> removeItemFromCart(
-            @PathVariable @ValidUUID String id) {
+            @PathVariable @GUID String id) {
         cartService.clearCart(UUID.fromString(id));
         return ResponseEntity.ok().build();
     }

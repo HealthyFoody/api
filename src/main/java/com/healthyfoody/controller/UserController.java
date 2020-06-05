@@ -1,29 +1,19 @@
 package com.healthyfoody.controller;
 
-import com.healthyfoody.config.JwtTokenUtil;
-import com.healthyfoody.dto.UserRequest;
-import com.healthyfoody.dto.AuthResponse;
-import com.healthyfoody.entity.Customer;
-import com.healthyfoody.entity.UserAccount;
-import com.healthyfoody.mapper.UserMapper;
-import com.healthyfoody.service.CustomerService;
-import com.healthyfoody.service.UserService;
-import com.healthyfoody.validation.annotations.ValidUUID;
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.authentication.*;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import com.healthyfoody.config.JwtTokenUtil;
+import com.healthyfoody.dto.request.LoginRequest;
+import com.healthyfoody.dto.request.UserRequest;
+import com.healthyfoody.dto.response.AuthResponse;
+import com.healthyfoody.service.CustomerService;
+import com.healthyfoody.service.UserService;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -40,36 +30,21 @@ public class UserController {
 	@Autowired
 	CustomerService customerService;
 
-	@Autowired
-	private UserMapper userMapper;
-
 	@PostMapping("/login")
-	public ResponseEntity<?> createAuthenticationToken(@RequestBody UserRequest authenticationRequest) throws Exception {
+	public ResponseEntity<?> createAuthenticationToken(@RequestBody LoginRequest loginRequest) throws Exception {
+		
+		authenticate(loginRequest.getEmail(), loginRequest.getPassword());
 
-		authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
-
-		UserAccount user = userService.findByEmail(authenticationRequest.getEmail());
-
-		final String token = jwtTokenUtil.generateToken(user);
+		final String token = jwtTokenUtil.generateToken(userService.findEntityByEmail(loginRequest.getEmail()));
 
 		return ResponseEntity.ok(new AuthResponse(token));
 	}
 	
 	@PostMapping("/register")
-	public ResponseEntity<?> saveUser(@RequestBody @Valid UserRequest user) throws Exception {
-		UserAccount userSaved = userService.register(userMapper.requestToEntity(user));
-		if(userSaved.getId() !=  null){
-			Customer customer = new  Customer();
-			customer.setFirstName(user.getFirstName());
-			customer.setLastName(user.getLastName());
-			customer.setUser(userSaved);
-			Customer insert = customerService.insert(customer);
-		}
-		return ResponseEntity.ok(userMapper.entityToResponse(userSaved));
-	}
-	@PostMapping("/customer/register")
-	public ResponseEntity<?> saveCustomer(@RequestBody @Valid Customer customer){
-		return ResponseEntity.ok(customerService.insert(customer));
+	public ResponseEntity<?> saveUser(@RequestBody @Valid UserRequest userRequest) throws Exception {
+
+		userService.register(userRequest);
+		return ResponseEntity.ok().build();
 	}
 
 	private void authenticate(String email, String password) throws Exception {
@@ -80,11 +55,5 @@ public class UserController {
 		} catch (BadCredentialsException e) {
 			throw new Exception("INVALID_CREDENTIALS", e);
 		}
-	}
-
-	@GetMapping("/customer/{id}")
-	public ResponseEntity<?> getCustomerById(@RequestParam @ValidUUID String id) {
-		UserAccount user = userService.findById(UUID.fromString(id));
-		return ResponseEntity.ok(customerService.findCustomerByUser(user));
 	}
 }

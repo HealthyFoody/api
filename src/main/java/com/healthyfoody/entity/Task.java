@@ -1,14 +1,17 @@
 package com.healthyfoody.entity;
 
-import lombok.*;
-import org.hibernate.annotations.NaturalId;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.NaturalId;
+
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
 @Entity
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = TableName.TASK)
@@ -16,7 +19,7 @@ import javax.validation.constraints.NotNull;
 public class Task {
 
     @Id
-    Integer id;
+    Long id;
 
     @NotNull
     @NaturalId

@@ -1,25 +1,19 @@
 package com.healthyfoody.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
 @Entity
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = TableName.ADDRESS)
-@EqualsAndHashCode
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public class Address extends BaseEntity {
 
 	String name;
@@ -35,22 +29,8 @@ public class Address extends BaseEntity {
 	Double longitude;
 
 	@NotNull
-	String line1;
-
-	String line2;
+	String fullAddress;
 
 	@NotNull
-	String city;
-
-	@NotNull
-	String district;
-
-	@NotNull
-	String zipCode;
-
-	@NotNull
-	Boolean listed;
-
-	@NotNull
-	Boolean defaultAddress;
+	Boolean isDefault;
 }

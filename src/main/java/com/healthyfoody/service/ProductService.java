@@ -1,18 +1,24 @@
 package com.healthyfoody.service;
 
-import com.healthyfoody.entity.*;
-import com.healthyfoody.exception.ResourceNotFoundException;
-import org.springframework.data.domain.Page;
-
-import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
-public interface ProductService extends CrudService<Product, UUID> {
+import org.springframework.data.domain.Page;
 
-    Page<Product> findAllByCategory(UUID categoryId, int page, int size) throws ResourceNotFoundException;
+import com.healthyfoody.dto.response.ProductResponse;
+import com.healthyfoody.entity.*;
+import com.healthyfoody.exception.ResourceNotFoundException;
 
-    Product findTypedById(UUID id, ProductType type) throws ResourceNotFoundException;
+public interface ProductService extends ResourceService<ProductResponse, Product, UUID> {
 
+    Page<ProductResponse> findAllByCategory(UUID categoryId, int page, int size) throws ResourceNotFoundException;
+
+    ProductResponse findTypedById(UUID id, ProductType type) throws ResourceNotFoundException;
+
+    //FIXME: change type
     List<MealGroup> loadComboDetail(UUID comboId, Boolean verifyExpired) throws ResourceNotFoundException;
+
+	Combo findComboEntityById(UUID id) throws ResourceNotFoundException;
+
+	Meal findMealEntityById(UUID id) throws ResourceNotFoundException;
 }

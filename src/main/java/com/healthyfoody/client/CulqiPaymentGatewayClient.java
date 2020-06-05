@@ -36,8 +36,8 @@ public class CulqiPaymentGatewayClient implements PaymentGatewayClient, CardStor
 		Customer customer = order.getCustomer();
 
 		antifraudDetails.put("address", order.getAddress());
-		antifraudDetails.put("first_name", customer.getFirstName());
-		antifraudDetails.put("last_name", customer.getLastName());
+		antifraudDetails.put("first_name", customer.getUser().getFirstName());
+		antifraudDetails.put("last_name", customer.getUser().getLastName());
 
 		Map<String, Object> metadata = new HashMap<String, Object>();
 		metadata.put("oder_id", order.getId().toString());

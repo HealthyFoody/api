@@ -1,26 +1,21 @@
 package com.healthyfoody.service.impl;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.healthyfoody.entity.Combo;
-import com.healthyfoody.entity.Meal;
-import com.healthyfoody.entity.MealGroup;
-import com.healthyfoody.entity.Product;
-import com.healthyfoody.entity.ProductType;
+import com.healthyfoody.dto.response.ProductResponse;
+import com.healthyfoody.entity.*;
 import com.healthyfoody.exception.ResourceNotFoundException;
+import com.healthyfoody.mapper.ProductMapper;
 import com.healthyfoody.repository.jpa.ProductRepository;
 import com.healthyfoody.service.ProductService;
+import com.healthyfoody.util.PageMapper;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -28,35 +23,34 @@ public class ProductServiceImpl implements ProductService {
 	@Autowired
 	ProductRepository productRepository;
 
+	@Autowired
+	ProductMapper productMapper;
+	
 	@Override
-	public Page<Product> findAllByCategory(UUID categoryId, int page, int size) {
+	public Page<ProductResponse> findAllByCategory(UUID categoryId, int page, int size) {
 
-		Pageable pageable = PageRequest.of(page, size);
-
-		return productRepository.findAllFromCategory(categoryId, pageable);
+		Page<Product> result = productRepository.findAllFromCategory(categoryId, PageRequest.of(page, size));
+		return PageMapper.mapPage(result, productMapper);
 	}
 
 	@Override
-	public Product findTypedById(UUID id, ProductType type) throws ResourceNotFoundException {
+	public ProductResponse findTypedById(UUID id, ProductType type) throws ResourceNotFoundException {
 
-		Optional<Product> result = productRepository.findById(id);
-		Class<?> auxClass = null;
-
+		Product result = null;
 		switch (type) {
 		case MEAL:
-			auxClass = Meal.class;
+			result = findMealEntityById(id);
 			break;
 		case COMBO:
-			auxClass = Combo.class;
+			result = findComboEntityById(id);
 			break;
 		case ANY:
 		default:
-			auxClass = Product.class;
+			result = findEntityById(id);
 			break;
-		}
+		}		
 
-		Class<?> entityClass = auxClass;
-		return result.filter(entityClass::isInstance).orElseThrow(() -> new ResourceNotFoundException(id, entityClass));
+		return productMapper.toResponse(result);
 	}
 
 	@Override
@@ -72,7 +66,28 @@ public class ProductServiceImpl implements ProductService {
 
 
 	@Override
-	public Product findById(UUID id) throws ResourceNotFoundException {
+	public ProductResponse findById(UUID id) throws ResourceNotFoundException {
 		return findTypedById(id, ProductType.ANY);
+	}
+
+	@Override
+	public Product findEntityById(UUID id) throws ResourceNotFoundException {
+		return findTypedEntityById(id, Product.class);
+	}
+	
+	@Override
+	public Combo findComboEntityById(UUID id) throws ResourceNotFoundException {
+		return (Combo) findTypedEntityById(id, Combo.class);
+	}
+	
+	@Override
+	public Meal findMealEntityById(UUID id) throws ResourceNotFoundException {
+		return (Meal) findTypedEntityById(id, Meal.class);
+	}
+	
+	private Product findTypedEntityById(UUID id, Class<?> entityClass) {
+		return productRepository.findById(id)
+				.filter(entityClass::isInstance)
+				.orElseThrow(() -> new ResourceNotFoundException(id, entityClass));
 	}
 }

@@ -9,7 +9,9 @@ import java.util.UUID;
 @Data
 public class StockId implements Serializable {
 
-    @Type(type = "uuid-char")
+	private static final long serialVersionUID = 1L;
+
+	@Type(type = "uuid-char")
     UUID product;
 
     @Type(type = "uuid-char")

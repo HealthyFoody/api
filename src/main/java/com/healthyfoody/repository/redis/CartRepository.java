@@ -1,9 +1,10 @@
 package com.healthyfoody.repository.redis;
 
-import com.healthyfoody.entity.Cart;
+import java.util.UUID;
+
 import org.springframework.data.repository.CrudRepository;
 
-import java.util.UUID;
+import com.healthyfoody.entity.redis.Cart;
 
 public interface CartRepository extends CrudRepository<Cart, UUID> {
 }

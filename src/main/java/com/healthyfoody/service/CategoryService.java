@@ -1,8 +1,9 @@
 package com.healthyfoody.service;
 
-import com.healthyfoody.entity.Category;
-
 import java.util.UUID;
 
-public interface CategoryService extends CrudService<Category, UUID> {
+import com.healthyfoody.dto.response.CategoryResponse;
+import com.healthyfoody.entity.Category;
+
+public interface CategoryService extends ResourceService<CategoryResponse, Category, UUID> {
 }

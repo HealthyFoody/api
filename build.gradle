@@ -2,11 +2,11 @@ plugins {
 	id 'org.springframework.boot' version '2.2.6.RELEASE'
 	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
 	id 'org.asciidoctor.convert' version '1.5.8'
-	id 'org.sonarqube' version '2.8'
+	id 'org.sonarqube' version '3.0'
+	id 'com.diffplug.eclipse.apt' version '3.22.0'
 	id 'java'
 	id 'jacoco'
 }
-
 
 group = 'com.healthyfoody'
 version = '0.0.1-SNAPSHOT'
@@ -28,47 +28,54 @@ jacoco {
 
 sonarqube {
 	properties{
-		property 'sonar.coverage.exclusions', "src/main/java/com/healthyfoody/dto/**,src/main/java/com/healthyfoody/entity/**,src/main/java/com/healthyfoody/repository/**"
+		//property 'sonar.coverage.exclusions', "src/main/java/com/healthyfoody/dto/**,src/main/java/com/healthyfoody/entity/**,src/main/java/com/healthyfoody/repository/**"
 	}
 }
 
-
-repositories {
+repositories {mavenLocal()
+	mavenLocal()
+	mavenCentral()
 	maven {
 		url 'https://repo.osgeo.org/repository/release/'
 	}
 	maven {
 		url 'https://jitpack.io'
 	}
-	mavenCentral()
 }
 
 ext {
-	set('snippetsDir', file('build/generated-snippets'))
+	mapstructVersion = '1.4.0.Beta1'
+	set('junit-jupiter.version', '5.6.2')
+	snippetsDir = file('build/generated-snippets')
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'com.voodoodyne.jackson.jsog:jackson-jsog:1.1.1'
 	implementation 'org.springframework.boot:spring-boot-starter-hateoas'
-	compileOnly 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	runtimeOnly 'mysql:mysql-connector-java'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
-
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+	
 	implementation 'io.jsonwebtoken:jjwt:0.9.1'
 	compile 'io.jsonwebtoken:jjwt-jackson:0.11.1'
-
-	implementation 'com.github.culqi:culqi-java:v1.1.9'
-
-	implementation 'org.mapstruct:mapstruct:1.3.1.Final'
-	annotationProcessor 'org.mapstruct:mapstruct-processor:1.3.1.Final'
+		
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	runtimeOnly 'mysql:mysql-connector-java'
 	runtime 'com.h2database:h2'
+	
+	implementation 'com.github.culqi:culqi-java:v1.1.9'
+	
+	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+    	exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+  	}
+  	testImplementation 'com.github.javafaker:javafaker:1.0.2'
+  	testImplementation 'it.ozimov:embedded-redis:0.7.2'
 }
 
 test {

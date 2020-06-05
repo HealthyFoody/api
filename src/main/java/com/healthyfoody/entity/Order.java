@@ -1,29 +1,26 @@
 package com.healthyfoody.entity;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+
+import lombok.*;
+import lombok.experimental.SuperBuilder;
+
 @Getter
 @Setter
 @Entity
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = TableName.ORDER)
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public class Order extends BaseEntity {
-
+	
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "customer_id")
 	private Customer customer;
@@ -63,7 +60,6 @@ public class Order extends BaseEntity {
 	@NotNull
 	private LocalDateTime programmedFor;
 
-	@JsonIgnore
 	@OneToMany(mappedBy = "order", orphanRemoval = true, cascade = CascadeType.ALL)
 	private List<Tracking> tracking;
 
@@ -73,7 +69,7 @@ public class Order extends BaseEntity {
 
 		BigDecimal price = new BigDecimal(0L);
 		for (OrderProduct op: orderProducts) {
-			price = price.add(op.getPrice());
+			price = price.add(op.getPrice().multiply(BigDecimal.valueOf(op.getQuantity())));
 		}
 		return price.setScale(2,RoundingMode.FLOOR);
 	}

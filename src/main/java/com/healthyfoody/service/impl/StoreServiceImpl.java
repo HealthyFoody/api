@@ -1,31 +1,39 @@
 package com.healthyfoody.service.impl;
 
-import com.healthyfoody.entity.Store;
-import com.healthyfoody.exception.ResourceNotFoundException;
-import com.healthyfoody.repository.jpa.StoreRepository;
-import com.healthyfoody.service.StoreService;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import com.healthyfoody.dto.response.StoreResponse;
+import com.healthyfoody.entity.Store;
+import com.healthyfoody.exception.ResourceNotFoundException;
+import com.healthyfoody.mapper.StoreMapper;
+import com.healthyfoody.repository.jpa.StoreRepository;
+import com.healthyfoody.service.StoreService;
 
 @Service
 public class StoreServiceImpl implements StoreService {
 
 	private static final double MAX_DISTANCE = 5000;
+	
 	@Autowired
 	StoreRepository storeRepository;
+	
+	@Autowired
+	StoreMapper storeMapper;
 
 	@Override
-	public List<Store> findNearbyStores(double latitude, double longitude) {
+	public List<StoreResponse> findNearbyStores(double latitude, double longitude) {
 		List<Store> stores = storeRepository.findAll();
 
-		return stores.stream()
+		List<Store> result = stores.stream()
 				.filter(x -> distance(x.getLatitude(), latitude, x.getLongitude(), longitude) <= MAX_DISTANCE)
 				.collect(Collectors.toList());
+		
+		return storeMapper.mapResponseList(result);
 	}
 
 	@Override
@@ -36,13 +44,15 @@ public class StoreServiceImpl implements StoreService {
 	}
 
 	@Override
-	public List<Store> findAll() {
-		return storeRepository.findAll();
+	public List<StoreResponse> findAll() {
+		List<Store> result = storeRepository.findAll();
+		return storeMapper.mapResponseList(result);
 	}
 
 	@Override
-	public Store findById(UUID id) throws ResourceNotFoundException {
-		return storeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id, Store.class));
+	public StoreResponse findById(UUID id) throws ResourceNotFoundException {
+		Store result = findEntityById(id);
+		return storeMapper.toResponse(result);
 	}
 
 	public double distance(double lat1, double lat2, double lon1, double lon2) {
@@ -57,6 +67,11 @@ public class StoreServiceImpl implements StoreService {
 		double distance = R * c * 1000; // convert to meters
 
 		return distance;
+	}
+
+	@Override
+	public Store findEntityById(UUID id) throws ResourceNotFoundException {
+		return storeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id, Store.class));
 	}
 
 }

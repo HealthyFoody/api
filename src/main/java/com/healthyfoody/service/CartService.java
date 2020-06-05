@@ -1,16 +1,17 @@
 package com.healthyfoody.service;
 
-import com.healthyfoody.entity.Cart;
-import com.healthyfoody.entity.OrderProduct;
-import com.healthyfoody.exception.CartValidationException;
-
 import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
-public interface CartService extends CrudService<Cart, UUID> {
+import com.healthyfoody.dto.response.CartResponse;
+import com.healthyfoody.entity.OrderProduct;
+import com.healthyfoody.entity.Store;
+import com.healthyfoody.entity.redis.Cart;
 
-    Object createCart(UUID customerId);
+public interface CartService extends ResourceService<CartResponse, Cart, UUID> {
+
+    CartResponse obtainCustomerCart(UUID customerId);
 
     void addToCart(UUID id, UUID productId, int quantityOrInstance, List<UUID> components, boolean override);
 
@@ -18,9 +19,5 @@ public interface CartService extends CrudService<Cart, UUID> {
 
     void clearCart(UUID id);
 
-    void lockCart(Cart cart);
-
-    void unlockCart(Cart cart);
-
-    List<OrderProduct> processCart(UUID id, UUID storeId, LocalTime hour) throws CartValidationException;
+    List<OrderProduct> processCart(UUID id, Store store, LocalTime programmedHour);
 }

@@ -1,27 +1,24 @@
 package com.healthyfoody.entity;
 
-import com.fasterxml.jackson.annotation.*;
-import com.voodoodyne.jackson.jsog.JSOGGenerator;
-import lombok.Getter;
-import lombok.Setter;
+import java.math.BigDecimal;
+import java.util.List;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
-import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
 @Entity
+@SuperBuilder
+@NoArgsConstructor
 @Table(name = TableName.PRODUCT)
 @Inheritance(strategy = InheritanceType.JOINED)
-@JsonTypeInfo(
-		use = JsonTypeInfo.Id.NAME,
-		property = "type")
-@JsonSubTypes({
-		@JsonSubTypes.Type(value = Meal.class, name = "meal"),
-		@JsonSubTypes.Type(value = Combo.class, name = "combo")
-})
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public abstract class Product extends BaseEntity {
 
 	@NotNull

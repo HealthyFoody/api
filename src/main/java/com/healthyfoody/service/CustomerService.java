@@ -1,11 +1,11 @@
 package com.healthyfoody.service;
 
-import com.healthyfoody.entity.Customer;
-import com.healthyfoody.entity.UserAccount;
-
 import java.util.UUID;
 
-public interface CustomerService extends CrudService<Customer, UUID> {
+import com.healthyfoody.dto.response.CustomerResponse;
+import com.healthyfoody.entity.Customer;
 
-    Customer findCustomerByUser(UserAccount user);
+public interface CustomerService extends ResourceService<CustomerResponse, Customer, UUID> {
+
+	CustomerResponse findCustomerByUser(UUID userId);
 }

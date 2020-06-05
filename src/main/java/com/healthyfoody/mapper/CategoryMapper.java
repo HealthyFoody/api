@@ -1,15 +1,12 @@
 package com.healthyfoody.mapper;
 
-import com.healthyfoody.dto.CategoryDto;
-import com.healthyfoody.entity.Category;
 import org.mapstruct.Mapper;
 
-import java.util.List;
+import com.healthyfoody.dto.response.CategoryResponse;
+import com.healthyfoody.entity.Category;
 
-@Mapper(componentModel = "spring")
-public interface CategoryMapper {
-
-    List<CategoryDto> categoriesToDtoList(List<Category> entities);
-
-    CategoryDto categoryToDto(Category entity);
+@Mapper(config = SharedMapperConfig.class)
+public interface CategoryMapper extends ResponseMapper<CategoryResponse, Category> {
+	
+	CategoryResponse toResponse(Category entity);
 }

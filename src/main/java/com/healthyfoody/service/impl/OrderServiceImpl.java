@@ -9,27 +9,23 @@ import static com.healthyfoody.entity.OrderStatus.READY_FOR_PICKUP;
 import static com.healthyfoody.entity.OrderStatus.REFUNDED;
 import static com.healthyfoody.entity.OrderStatus.SENT;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.UUID;
 
 import javax.transaction.Transactional;
 
-import com.healthyfoody.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import com.healthyfoody.dto.request.OrderRequest;
+import com.healthyfoody.dto.response.OrderResponse;
+import com.healthyfoody.entity.*;
 import com.healthyfoody.exception.ResourceNotFoundException;
+import com.healthyfoody.mapper.OrderMapper;
 import com.healthyfoody.repository.jpa.OrderRepository;
-import com.healthyfoody.service.CartService;
-import com.healthyfoody.service.DeliveryTask;
-import com.healthyfoody.service.OrderService;
-import com.healthyfoody.service.StoreService;
-import com.healthyfoody.service.TrackingService;
+import com.healthyfoody.service.*;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -39,6 +35,9 @@ public class OrderServiceImpl implements OrderService {
 
 	@Autowired
 	StoreService storeService;
+	
+	@Autowired
+	CustomerService customerService;
 
 	@Autowired
 	OrderRepository orderRepository;
@@ -48,26 +47,31 @@ public class OrderServiceImpl implements OrderService {
 
 	@Autowired
 	TrackingService trackingService;
+	
+	@Autowired
+	OrderMapper orderMapper;
 
 	@Override
-	public Page<Order> findCustomerOrders(UUID customerId, int page, int size) {
+	public Page<OrderResponse> findCustomerOrders(UUID customerId, int page, int size) {
 		return null;
 	}
 
 	@Override
 	@Transactional
-	public Order placeOrder(UUID cartId, Order request, PaymentType type) {
+	public OrderResponse placeOrder(UUID cartId, OrderRequest request, PaymentType type) {
 
 		Order order = new Order();
 
 		// TODO: Validate customer and store
+		Store store = storeService.findEntityById(request.getStoreId());
+		Customer customer = customerService.findEntityById(request.getCustomerId());
 
 		// VALIDA DIRECCION
-		storeService.inRangeOfStore(request.getStore().getId(), request.getLatitude(), request.getLongitude());
+		storeService.inRangeOfStore(store.getId(), request.getLatitude(), request.getLongitude());
 
 		// FIXME: argument should be mapped?
-		order.setCustomer(request.getCustomer());
-		order.setStore(request.getStore());
+		order.setCustomer(customer);
+		order.setStore(store);
 		order.setAddress(request.getAddress());
 		order.setLatitude(request.getLatitude());
 		order.setLongitude(request.getLongitude());
@@ -110,19 +114,20 @@ public class OrderServiceImpl implements OrderService {
 		order.setStatus(PLACED);
 
 		// OBTIENE EL CARRITO SI FUE VALIDADO
-		order.setOrderProducts(
-				cartService.processCart(cartId, request.getStore().getId(), request.getProgrammedFor().toLocalTime()));
+
+		order.setOrderProducts(cartService.processCart(cartId, store, request.getProgramedFor().toLocalTime()));
 
 		order.getOrderProducts().forEach(x -> x.setOrder(order));
 
-		return orderRepository.save(request);
+		Order result = orderRepository.save(order);
+		return orderMapper.toResponse(result);
 	}
 
 	@Override
 	@Transactional
-	public Order payOrder(UUID id, Object token) {
-		Order order = findById(id);
-
+	public OrderResponse payOrder(UUID id, Object token) {
+		Order order = findEntityById(id);
+		Order result = null;
 		if (validOperation(order.getStatus(), CHARGED, order.getPaymentType())) {
 
 			// TODO: Call paymentGateWay and make charge
@@ -132,9 +137,9 @@ public class OrderServiceImpl implements OrderService {
 
 			order.getTracking().add(tracking);
 
-			return orderRepository.save(order);
+			result = orderRepository.save(order);
 		}
-		return null;
+		return orderMapper.toResponse(result);
 	}
 
 	@Override
@@ -148,7 +153,7 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public Order findById(UUID id) throws ResourceNotFoundException {
+	public Order findEntityById(UUID id) throws ResourceNotFoundException {
 		return orderRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id, Order.class));
 	}
 
@@ -167,13 +172,22 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	private boolean validOperation(OrderStatus currentStatus, OrderStatus newStatus, PaymentType type) {
-
+		switch (type) {
+		case CARD_PAYMENT:
+			return validCardOperation(currentStatus, newStatus);
+		case UPON_DELIVERY:
+			return validCashOperation(currentStatus, newStatus);
+		default:
+			throw new RuntimeException("La operación no es válida");
+		}
+	}
+	
+	private boolean validCardOperation(OrderStatus currentStatus, OrderStatus newStatus) {
 		switch (currentStatus) {
 		case PLACED:
-			return newStatus == CANCELLED || (newStatus == CHARGED && type == PaymentType.CARD_PAYMENT)
-					|| (newStatus == PREPARED && type == PaymentType.UPON_DELIVERY);
+			return newStatus == CANCELLED || newStatus == CHARGED;
 		case CHARGED:
-			return type == PaymentType.CARD_PAYMENT && (newStatus == PREPARED || newStatus == CANCELLED);
+			return newStatus == PREPARED || newStatus == CANCELLED;
 		case PREPARED:
 			return newStatus == SENT;
 		case SENT:
@@ -181,7 +195,7 @@ public class OrderServiceImpl implements OrderService {
 		case READY_FOR_PICKUP:
 			return newStatus == FULFILLED;
 		case CANCELLED:
-			return type == PaymentType.CARD_PAYMENT && newStatus == REFUNDED;
+			return newStatus == REFUNDED;
 		case FULFILLED:
 		case REFUNDED:
 			return false;
@@ -189,5 +203,23 @@ public class OrderServiceImpl implements OrderService {
 			throw new RuntimeException("La operación no es válida");
 		}
 	}
+	
+	private boolean validCashOperation(OrderStatus currentStatus, OrderStatus newStatus) {
+		switch (currentStatus) {
+		case PLACED:
+			return newStatus == CANCELLED || newStatus == PREPARED;
+		case PREPARED:
+			return newStatus == SENT;
+		case SENT:
+			return newStatus == READY_FOR_PICKUP;
+		case READY_FOR_PICKUP:
+			return newStatus == FULFILLED;
+		case FULFILLED:
+			return false;
+		default:
+			throw new RuntimeException("La operación no es válida");
+		}
+	}
+
 
 }

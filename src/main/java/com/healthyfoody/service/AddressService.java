@@ -1,15 +1,17 @@
 package com.healthyfoody.service;
 
-import com.healthyfoody.entity.Address;
-import com.healthyfoody.exception.ResourceNotFoundException;
-
 import java.util.List;
 import java.util.UUID;
 
-public interface AddressService extends CrudService<Address, UUID> {
-    List<Address> findByCustomer(UUID customerId);
+import com.healthyfoody.dto.request.AddressRequest;
+import com.healthyfoody.dto.response.AddressResponse;
+import com.healthyfoody.entity.Address;
+import com.healthyfoody.exception.ResourceNotFoundException;
 
-    Address findDefaultAddress(UUID customerId);
+public interface AddressService extends ResourceService<AddressResponse, Address, UUID>, TransactionSevice<AddressResponse, AddressRequest, UUID> {
+    List<AddressResponse> findByCustomer(UUID customerId);
+
+    AddressResponse findDefaultAddress(UUID customerId);
 
     void makeDefaultAddress(UUID id) throws ResourceNotFoundException;
 }

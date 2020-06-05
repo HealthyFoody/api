@@ -1,22 +1,20 @@
 package com.healthyfoody.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-import javax.validation.constraints.NotNull;
 import java.time.LocalTime;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
 @Entity
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 @Table(name = TableName.SALE_TIME_SPAN, uniqueConstraints = {@UniqueConstraint(columnNames = {"starting_hour", "ending_hour"})})
 public class SaleTimeSpan extends BaseEntity {
 

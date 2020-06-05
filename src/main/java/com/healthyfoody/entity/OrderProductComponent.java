@@ -1,17 +1,18 @@
 package com.healthyfoody.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Type;
+import java.util.UUID;
 
 import javax.persistence.Embeddable;
-import java.util.UUID;
+
+import org.hibernate.annotations.Type;
+
+import lombok.*;
 
 @Data
 @Embeddable
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 public class OrderProductComponent {
     @Type(type = "uuid-char")
     UUID mealId;

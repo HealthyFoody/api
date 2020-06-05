@@ -1,20 +1,22 @@
 package com.healthyfoody.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.List;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
 @Entity
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 @Table(name = TableName.MEAL_GROUP, uniqueConstraints = @UniqueConstraint(columnNames = { "combo_id", "name" }))
 public class MealGroup extends BaseEntity {
 
@@ -30,7 +32,8 @@ public class MealGroup extends BaseEntity {
 	Boolean optional;
 
 	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = TableName.COMBO_GROUP_MEAL, joinColumns = {
-			@JoinColumn(name = "group_id") }, inverseJoinColumns = { @JoinColumn(name = "meal_id") })
+	@JoinTable(name = TableName.COMBO_GROUP_MEAL, 
+			joinColumns = { @JoinColumn(name = "group_id") }, 
+			inverseJoinColumns = { @JoinColumn(name = "meal_id") })
 	List<Meal> meals;
 }

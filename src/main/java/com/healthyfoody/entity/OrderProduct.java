@@ -1,32 +1,24 @@
 package com.healthyfoody.entity;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.math.BigDecimal;
+import java.util.Set;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
-import java.util.List;
+
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
 @Entity
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = TableName.ORDER_PRODUCT)
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class OrderProduct {
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
+public class OrderProduct extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
-
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Order order;
 
@@ -47,5 +39,5 @@ public class OrderProduct {
     private Boolean isCombo;
 
     @ElementCollection
-    List<OrderProductComponent> components;
+    Set<OrderProductComponent> components;
 }

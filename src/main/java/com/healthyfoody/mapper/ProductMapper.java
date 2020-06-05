@@ -1,19 +1,21 @@
 package com.healthyfoody.mapper;
 
-import com.healthyfoody.dto.ComboModelDto;
-import com.healthyfoody.dto.MealModelDto;
-import com.healthyfoody.dto.ProductResponse;
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import com.healthyfoody.entity.Combo;
-import com.healthyfoody.entity.Meal;
-import com.healthyfoody.entity.Product;
+import com.healthyfoody.dto.response.ComboResponse;
+import com.healthyfoody.dto.response.ComboResponse.ComboGroup;
+import com.healthyfoody.dto.response.MealResponse;
+import com.healthyfoody.dto.response.ProductResponse;
+import com.healthyfoody.entity.*;
 
-@Mapper(componentModel = "spring")
-public interface ProductMapper {
+@Mapper(config = SharedMapperConfig.class)
+public interface ProductMapper extends ResponseMapper<ProductResponse, Product> {
 
-	default ProductResponse productToDto(Product entity) {
+	@Override
+	default ProductResponse toResponse(Product entity) {
 		if (entity != null) {
 			if (entity instanceof Meal) {
 				return mealToDto((Meal) entity);
@@ -24,12 +26,13 @@ public interface ProductMapper {
 		}
 		return null;
 	}
+	
+	@Mapping(target = "toHour", source = "saleTimeSpan.endingHour")
+	MealResponse mealToDto(Meal entity);
 
-	@Mapping(target = "saleStartsAt", source = "saleTimeSpan.startingHour")
-	@Mapping(target = "saleStopsAt", source = "saleTimeSpan.endingHour")
-	MealModelDto mealToDto(Meal entity);
-
-	@Mapping(target = "saleStartsAt", source = "saleTimeSpan.startingHour")
-	@Mapping(target = "saleStopsAt", source = "saleTimeSpan.endingHour")
-	ComboModelDto comboToDto(Combo entity);
+	@Mapping(target = "toHour", source = "saleTimeSpan.endingHour")
+	@Mapping(target = "groups", source = "mealGroups")
+	ComboResponse comboToDto(Combo entity);
+	
+	List<ComboGroup> mapComboDetail(List<MealGroup> list);
 }
