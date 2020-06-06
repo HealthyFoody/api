@@ -28,10 +28,12 @@ public interface ProductMapper extends ResponseMapper<ProductResponse, Product> 
 	}
 	
 	@Mapping(target = "toHour", source = "saleTimeSpan.endingHour")
+	@Mapping(target = "type", constant = "meal")
 	MealResponse mealToDto(Meal entity);
 
 	@Mapping(target = "toHour", source = "saleTimeSpan.endingHour")
 	@Mapping(target = "groups", source = "mealGroups")
+	@Mapping(target = "type", constant = "combo")
 	ComboResponse comboToDto(Combo entity);
 	
 	List<ComboGroup> mapComboDetail(List<MealGroup> list);

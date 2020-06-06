@@ -41,7 +41,9 @@ public class UserController {
 	}
 	
 	@PostMapping("/register")
-	public ResponseEntity<?> saveUser(@RequestBody @Valid UserRequest userRequest) throws Exception {
+	public ResponseEntity<?> saveUser(
+			@RequestBody @Valid UserRequest userRequest
+	) throws Exception {
 
 		userService.register(userRequest);
 		return ResponseEntity.ok().build();
