@@ -6,7 +6,7 @@ public class ResourceNotFoundException extends BusinessException {
 		super(entityClass.getSimpleName() + ": No se encuentra el recurso con id " + id.toString());
 	}
 
-	public ResourceNotFoundException(String id, String field, Class<?> entityClass) {
-		super(entityClass.getSimpleName() + ": No se encuentra el recurso con " + field + " " + id.toString());
+	public ResourceNotFoundException(Object value, String field, Class<?> entityClass) {
+		super(entityClass.getSimpleName() + ": No se encuentra el recurso con " + field + " " + value.toString());
 	}
 }

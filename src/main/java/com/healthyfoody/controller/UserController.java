@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.web.bind.annotation.*;
 
-import com.healthyfoody.config.JwtTokenUtil;
+import com.healthyfoody.config.security.JwtTokenUtil;
 import com.healthyfoody.dto.request.LoginRequest;
 import com.healthyfoody.dto.request.UserRequest;
 import com.healthyfoody.dto.response.AuthResponse;

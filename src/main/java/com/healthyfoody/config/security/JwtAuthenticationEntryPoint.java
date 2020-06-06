@@ -1,4 +1,4 @@
-package com.healthyfoody.config;
+package com.healthyfoody.config.security;
 
 import java.io.IOException;
 import java.io.Serializable;

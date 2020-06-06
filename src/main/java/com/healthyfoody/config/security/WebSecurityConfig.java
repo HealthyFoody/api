@@ -1,4 +1,4 @@
-package com.healthyfoody.config;
+package com.healthyfoody.config.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

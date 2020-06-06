@@ -1,6 +1,6 @@
 package com.healthyfoody.entity;
 
-public class TableName {
+public final class TableName {
 
 	private TableName() { }
 

@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.healthyfoody.entity.Task;
+import com.healthyfoody.entity.Task.DeliveryTask;
 import com.healthyfoody.entity.Tracking;
 import com.healthyfoody.repository.jpa.TaskRepository;
-import com.healthyfoody.service.DeliveryTask;
 import com.healthyfoody.service.TrackingService;
 
 @Service

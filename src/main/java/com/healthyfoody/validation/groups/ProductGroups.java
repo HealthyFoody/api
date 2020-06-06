@@ -1,6 +1,8 @@
 package com.healthyfoody.validation.groups;
 
-public interface ProductGroups {
+public final class ProductGroups {
+	
+	private ProductGroups() {}
 	
 	public static interface OnMeals {}
 	

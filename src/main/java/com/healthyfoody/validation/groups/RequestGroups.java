@@ -1,6 +1,6 @@
 package com.healthyfoody.validation.groups;
 
-public interface RequestGroups {
+public final class RequestGroups {
 	
 	public static interface OnRegister {}
 	
