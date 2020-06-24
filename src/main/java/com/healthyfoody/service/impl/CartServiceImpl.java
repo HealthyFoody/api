@@ -41,12 +41,13 @@ public class CartServiceImpl implements CartService {
 		Cart cart = null;
 		Customer customer = customerService.findEntityById(customerId);
 		UUID cartId = customer.getCurrentCart();
-		if (cartId == null) {
+		if (cartId != null) {
 			cart = findEntityById(cartId);
 			if (!cart.getMutable())
 				cart = createCart();
 		} else {
-			createCart();
+			cart = createCart();
+			customerService.updateActiveCart(customer, cart.getId());
 		}
 		CartResponse response = cartMapper.toResponse(cart);
 		response.setCustomerId(customerId.toString());

@@ -10,4 +10,6 @@ public interface CustomerService extends ResourceService<CustomerResponse, Custo
 	CustomerResponse findCustomerByUser(UUID userId);
 
 	void createCustomerProfile(UUID userId);
+
+	void updateActiveCart(Customer customer, UUID cartId);
 }

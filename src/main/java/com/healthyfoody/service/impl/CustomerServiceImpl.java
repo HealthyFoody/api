@@ -38,6 +38,12 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public void updateActiveCart(Customer customer, UUID cartId) {
+        customer.setCurrentCart(cartId);
+        save(customer);
+    }
+
+    @Override
     public CustomerResponse findCustomerByUser(UUID userId) {
     	
     	Customer result = null;
