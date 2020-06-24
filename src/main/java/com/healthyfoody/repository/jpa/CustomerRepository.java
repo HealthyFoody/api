@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface CustomerRepository extends JpaRepository<Customer, UUID> {
 
-    Optional<Customer> findCustomerByUser(UserAccount user);
+    Optional<Customer> findCustomerByUserId(UUID userId);
 
-    Boolean existsCustomerByUser(UserAccount user);
+    Boolean existsCustomerByUserId(UUID userId);
 }

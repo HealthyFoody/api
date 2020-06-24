@@ -8,4 +8,6 @@ import com.healthyfoody.entity.Customer;
 public interface CustomerService extends ResourceService<CustomerResponse, Customer, UUID> {
 
 	CustomerResponse findCustomerByUser(UUID userId);
+
+	void createCustomerProfile(UUID userId);
 }

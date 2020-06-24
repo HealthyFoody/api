@@ -21,27 +21,29 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Autowired
     CustomerRepository customerRepository;
-    
-    @Autowired
-    UserService UserRepository;
-    
+
     @Autowired
     CustomerMapper customerMapper;
+
+    public void createCustomerProfile(UUID userId) {
+
+        if (!customerRepository.existsCustomerByUserId(userId)){
+            Customer customer = new Customer();
+
+            UserAccount user = UserAccount.builder().id(userId).build();
+            customer.setUser(user);
+
+            save(customer);
+        }
+    }
 
     @Override
     public CustomerResponse findCustomerByUser(UUID userId) {
     	
     	Customer result = null;
-    	
-    	UserAccount user = UserAccount.builder().id(userId).build();
-    	
-    	//TODO: verify user Exists
-        if (!customerRepository.existsCustomerByUser(user)){
-            Customer customer = new Customer();
-            customer.setUser(user);
 
-            result = save(customer);
-        }
+    	result = customerRepository.findCustomerByUserId(userId).orElseThrow(() -> new ResourceNotFoundException(userId, "userId", Customer.class));
+
         return customerMapper.toResponse(result);
     }
 

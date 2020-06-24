@@ -7,15 +7,9 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class CustomerResponse implements ApiResponse {
+public class CustomerResponse extends UserResponse {
 
 	String id;
-	
-	String userId;
-	
-	String firstName;
-	
-	String lastName;
-	
+
 	String currentCart;
 }

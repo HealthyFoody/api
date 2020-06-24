@@ -18,7 +18,7 @@ import com.healthyfoody.validation.annotations.GUID;
 @Validated
 @RestController
 @RequestMapping("/menu")
-public class ProductController {
+public class MenuController {
 
 	@Autowired
 	CategoryService categoryService;

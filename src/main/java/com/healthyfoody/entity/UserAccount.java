@@ -48,4 +48,7 @@ public class UserAccount extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	Role role;
+
+	@OneToOne(mappedBy = "user")
+	Customer customer;
 }

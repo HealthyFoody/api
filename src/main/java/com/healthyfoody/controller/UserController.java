@@ -2,6 +2,8 @@ package com.healthyfoody.controller;
 
 import javax.validation.Valid;
 
+import com.healthyfoody.entity.Customer;
+import com.healthyfoody.validation.annotations.GUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
@@ -13,6 +15,8 @@ import com.healthyfoody.dto.request.UserRequest;
 import com.healthyfoody.dto.response.AuthResponse;
 import com.healthyfoody.service.CustomerService;
 import com.healthyfoody.service.UserService;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
@@ -41,12 +45,17 @@ public class UserController {
 	}
 	
 	@PostMapping("/register")
-	public ResponseEntity<?> saveUser(
-			@RequestBody @Valid UserRequest userRequest
-	) throws Exception {
+	public ResponseEntity<?> saveUser(@RequestBody @Valid UserRequest userRequest) throws Exception {
 
-		userService.register(userRequest);
+		UUID userId = userService.register(userRequest);
+		customerService.createCustomerProfile(userId);
 		return ResponseEntity.ok().build();
+	}
+
+	@GetMapping("/customer/{customerId}")
+	public ResponseEntity<?> loadCustomerDetails(@PathVariable @GUID String customerId) {
+		return ResponseEntity.ok(customerService.findById(UUID.fromString(customerId)));
+
 	}
 
 	private void authenticate(String email, String password) throws Exception {

@@ -12,19 +12,19 @@ import lombok.Setter;
 @Setter
 public class UserResponse implements ApiResponse {
 
-	String email;
+	protected String email;
 
-	String role;
-	
-	String firstName;
+	protected String role;
 
-	String lastName;
+	protected String firstName;
 
-	Boolean emailValidated;
+	protected String lastName;
 
-	AccountStatus statusCode;
+	protected Boolean emailValidated;
 
-	LocalDateTime registeredOn;
+	protected AccountStatus statusCode;
 
-	LocalDateTime lastAccessOn;
+	protected LocalDateTime registeredOn;
+
+	protected LocalDateTime lastAccessOn;
 }

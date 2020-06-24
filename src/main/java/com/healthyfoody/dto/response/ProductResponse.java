@@ -12,12 +12,20 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public abstract class ProductResponse extends BaseProductResponse {
-	protected LocalTime toHour;
+@JsonTypeInfo(
+		  use = JsonTypeInfo.Id.NAME, 
+		  include = JsonTypeInfo.As.PROPERTY, 
+		  property = "type")
+@JsonSubTypes({ 
+	  @Type(value = MealResponse.class, name = "meal"), 
+	  @Type(value = ComboResponse.class, name = "combo") 
+	})
+public class ProductResponse extends BaseProductResponse {
+	protected LocalTime toHour; 
 	protected String description;
     protected BigDecimal price;
 	protected String imageUrl;
-	protected String type;
+
 }
 
 
