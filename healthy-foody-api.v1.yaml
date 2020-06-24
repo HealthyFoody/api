@@ -1,0 +1,171 @@
+openapi: 3.0.0
+info:
+  title: HealthyFoody Rest Api
+  version: '1.0'
+  description: Spring Boot REST API
+servers:
+  - url: 'http://ec2-18-224-64-139.us-east-2.compute.amazonaws.com'
+    description: AWS
+paths:
+  /users/login:
+    post:
+      summary: Login
+      tags:
+        - Authentication
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                required:
+                  - token
+              examples:
+                example-1:
+                  value:
+                    token: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkB1c2VyLmNvbSIsImV4cCI6MTU5MTQ1MDI5OSwidXNlcklkIjoiMzY2YjUwNzEtOWVhZi00MzU2LTljY2YtOWZlNWI1YTRkMmM4IiwiaWF0IjoxNTkxNDMyMjk5fQ.MYUqBMRCVCZcA5LVGx9beWJOZBSEH3dAZWCfuzVBSnuicA8Dy2AiilsnlXNDGp61pNZEtGBUsbeC7w1aV7Wy4A
+        '401':
+          description: Unauthorized
+      operationId: post-users-login
+      security: []
+      description: ''
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - email
+                - password
+            examples:
+              AuthRequest:
+                value:
+                  email: admin@user.com
+                  password: admin
+  /users/register:
+    post:
+      summary: Register Account
+      tags:
+        - Authentication
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  userId:
+                    type: string
+                  firstName:
+                    type: string
+                  lastName:
+                    type: string
+                required:
+                  - id
+                  - userId
+              examples:
+                Customer:
+                  value:
+                    id: 600de7c4-7a2c-43f0-92c8-65b19473ceac
+                    userId: 501e7175-313e-4c38-a8e2-89d97eea50d5
+                    firstName: John
+                    lastName: Doe
+      operationId: post-users-register
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+              required:
+                - email
+                - password
+            examples:
+              RegisterRequest:
+                value:
+                  email: user123@user.com
+                  password: password
+                  firstName: John
+                  lastName: Doe
+  /menu/categories:
+    get:
+      summary: Get All Categories
+      tags:
+        - Menu
+        - Category
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: {}
+      operationId: get-menu-categories
+  /menu/products:
+    get:
+      summary: Get All Products by Category
+      tags:
+        - Menu
+        - Product
+      responses: {}
+      operationId: get-menu-products
+  '/menu/categories/{categoryId}':
+    parameters:
+      - schema:
+          type: string
+        name: categoryId
+        in: path
+        required: true
+    get:
+      summary: Get Category by Id
+      tags:
+        - Menu
+        - Category
+      responses: {}
+      operationId: get-menu-categories-categoryId
+  '/menu/products/{productId}':
+    parameters:
+      - schema:
+          type: string
+        name: productId
+        in: path
+        required: true
+    get:
+      summary: Get Product By Id
+      tags:
+        - Menu
+        - Product
+        - Category
+      responses: {}
+      operationId: get-menu-products-productId
+components:
+  schemas: {}
+  securitySchemes:
+    JWT:
+      type: http
+      scheme: bearer
+      description: Json Web Token Authentication
+security:
+  - JWT: []
