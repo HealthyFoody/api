@@ -1,5 +1,5 @@
 insert into categories(id,description,name,image_url) values
-					('622da2a8-85ea-11ea-bc55-0242ac130003','Comidas esenciales del día','Ensaladas','categoria-ensalada'),
+					('622da2a8-85ea-11ea-bc55-0242ac130003','Comidas esenciales del día','Ensaladas','categoria_ensalada'),
 					('622da4ce-85ea-11ea-bc55-0242ac130003','Paquetes de ofertas','bundle','categoria_bundle'),
 					('82de0b1f-900c-41f7-8de4-3a64bec30b00','Almuerzos basados en pastas','Pastas','categoria_pasta'),
 					('7d6fd4c6-f896-414c-9111-9d8891cb486e','Almuerzos basados en menestras','Menestras','categoria_menestra'),
@@ -19,7 +19,7 @@ insert into products(id,description,listed,name,price,sale_time_span_id,image_ur
 					('d15562db-8bd0-4cc0-a1ea-c2d32e9325ba','Espaguetti con salsa blanca ',true,'Espaguetti con salsa blanca',12,'cc43f5d7-8544-4a1e-913f-bf48da7feb11','producto_espaguetti_salsablanca'),
 					('e59115a6-f65a-410f-a412-a36da63ead2e','Plato a base de lentejas y ensalada',true,'Lentejas con ensalada cocida',10,'cc43f5d7-8544-4a1e-913f-bf48da7feb11','producto_lenteja_ensalda'),
 					('a8311dc2-6aab-4a5d-acd9-727d8f6592a9','Plato de garbanzo con palta',true,'Garbanzo con palta',12,'cc43f5d7-8544-4a1e-913f-bf48da7feb11','producto_garbanzo_palta'),
-					('84663571-16ff-4c92-bbe4-67363f014703','Tortilla de pollo y verduras',true,'Tortilla de pollo y verduras',12,'cc43f5d7-8544-4a1e-913f-bf48da7feb11','producto-tortilla_pollo_verduras'),
+					('84663571-16ff-4c92-bbe4-67363f014703','Tortilla de pollo y verduras',true,'Tortilla de pollo y verduras',12,'cc43f5d7-8544-4a1e-913f-bf48da7feb11','producto_tortilla_pollo_verduras'),
 					('16d49d12-a5d5-4bd4-be4b-5a67379b5e8a','Tortilla de atún',true,'Tortilla de atún',10,'cc43f5d7-8544-4a1e-913f-bf48da7feb11','producto_tortilla_atun'),
 					('56a6b9d9-a0c6-4a43-9f03-5b4c65b02ae5','Pescado asado con verduras',true,'Pescado asado',12,'cc43f5d7-8544-4a1e-913f-bf48da7feb11','producto_pescado_asado'),
 					('73f44359-8a17-4d34-823e-ea29cc208f25','Pescado ahumado',true,'Pescado ahumado',12,'cc43f5d7-8544-4a1e-913f-bf48da7feb11','producto_pescado_ahumado'),
@@ -70,8 +70,10 @@ insert into combo_group_meals(group_id,meal_id) values
 
 insert into roles(id, description,name) values
                 		(1, 'Rol con privilegios de administrador','Administrador'),
-				(2,'Rol exclusivo para el uso del app de delivery como cliente','Cliente'),
-				(3,'Rol para el mantenimiento de datos de los platos','Gerente');
+				        (2,'Rol exclusivo para el uso del app de delivery como cliente','Cliente'),
+				        (3,'Rol para el mantenimiento de datos de los platos','Gerente'),
+						(4,'Rol para el encargado de realizar el delivery','Courier');
+
 
 insert into users(id, email, email_validated, first_name, last_name, last_access_on, password, registered_on, status_code, role_id) values
 				('366b5071-9eaf-4356-9ccf-9fe5b5a4d2c8','admin@user.com', true, 'Administrator', null, '20200101', '$2y$10$uIgID8e4NIKuddGCHLeCM.u7fhw7O7oALKcEmQD1XaaJ1ikTNL0gW', '20200101', 0, 1);
