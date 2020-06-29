@@ -41,8 +41,8 @@ public class CartServiceImpl implements CartService {
 		Cart cart = null;
 		Customer customer = customerService.findEntityById(customerId);
 		UUID cartId = customer.getCurrentCart();
-		if (cartId != null) {
-			cart = findEntityById(cartId);
+		cart = findEntityById(cartId);
+		if (cart != null) {
 			if (!cart.getMutable())
 				cart = createCart();
 		} else {
@@ -60,23 +60,23 @@ public class CartServiceImpl implements CartService {
 	}
 
 	@Override
-	public void addToCart(UUID id, UUID productId, int quantityOrInstance, List<UUID> components, boolean override) {
+	public Cart addToCart(UUID id, UUID productId, int quantityOrInstance, List<UUID> components, boolean override) {
 		CartManager cart = getCartManager(id);
 		Product product = productService.findEntityById(productId);		
 		
 		cart.addItem(product, quantityOrInstance, components, override);
 		
-		cartRepository.save(cart.getCart());
+		return cartRepository.save(cart.getCart());
 	}
 
 	@Override
-	public void deleteFromCart(UUID id, UUID productId, Integer instance) {
+	public Cart deleteFromCart(UUID id, UUID productId, Integer instance) {
 		CartManager cart = getCartManager(id);
 		Product product = productService.findEntityById(productId);	
 		
 		cart.deleteItem(product, instance);
 		
-		cartRepository.save(cart.getCart());
+		return cartRepository.save(cart.getCart());
 	}
 
 	@Override
@@ -90,7 +90,11 @@ public class CartServiceImpl implements CartService {
 
 	@Override
 	public Cart findEntityById(UUID id) throws ResourceNotFoundException {
-		return cartRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id, Cart.class));
+		//return cartRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id, Cart.class));
+		if(id == null){
+			return null;
+		}
+		return cartRepository.findById(id).orElse(null);
 	}
 
 	@Transactional

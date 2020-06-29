@@ -13,9 +13,9 @@ public interface CartService extends ResourceService<CartResponse, Cart, UUID> {
 
     CartResponse obtainCustomerCart(UUID customerId);
 
-    void addToCart(UUID id, UUID productId, int quantityOrInstance, List<UUID> components, boolean override);
+    Cart addToCart(UUID id, UUID productId, int quantityOrInstance, List<UUID> components, boolean override);
 
-    void deleteFromCart(UUID id, UUID productId, Integer instance);
+    Cart deleteFromCart(UUID id, UUID productId, Integer instance);
 
     void clearCart(UUID id);
 

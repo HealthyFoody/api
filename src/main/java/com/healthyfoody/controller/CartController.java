@@ -1,9 +1,18 @@
 package com.healthyfoody.controller;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import javax.validation.Valid;
 
+import com.healthyfoody.dto.response.BaseProductResponse;
+import com.healthyfoody.dto.response.BaseProductResponseDetails;
+import com.healthyfoody.dto.response.CartResponse;
+import com.healthyfoody.dto.response.CartResponseDetails;
+import com.healthyfoody.entity.Meal;
+import com.healthyfoody.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -24,11 +33,45 @@ public class CartController {
     @Autowired
     CartService cartService;
 
-    @GetMapping("/")
+    @Autowired
+    ProductService productService;
+
+    @GetMapping("")
     public ResponseEntity<?> requestCart(
             @GUID @RequestParam(name = "customer", required = false) String customerId) {
         return ResponseEntity.ok(cartService.obtainCustomerCart(UUID.fromString(customerId)));
     }
+
+    @GetMapping("/details")
+    public ResponseEntity<?> requestCartDetails(@GUID @RequestParam(name="customer",required = true)String customerId){
+        CartResponse cart = cartService.obtainCustomerCart(UUID.fromString(customerId));
+        CartResponseDetails cartDetails = new CartResponseDetails();
+        cartDetails.setId(cart.getId());
+        cartDetails.setCustomerId(cart.getCustomerId());
+        if(!cart.getMeals().isEmpty()){
+            List<BaseProductResponseDetails.MealItemDetailDto> meals = new ArrayList<>();
+            BigDecimal totalPrice = BigDecimal.valueOf(0.00);
+
+            for(BaseProductResponse.MealItemDto item : cart.getMeals()){
+                BaseProductResponseDetails.MealItemDetailDto mealDetail = new BaseProductResponseDetails.MealItemDetailDto();
+                mealDetail.setQuantity(item.getQuantity());
+                mealDetail.setId(item.getId());
+
+                Meal meal = productService.findMealEntityById(UUID.fromString(item.getId()));
+                mealDetail.setImageUrl(meal.getImageUrl());
+                mealDetail.setName(meal.getName());
+                mealDetail.setPrice(meal.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+                totalPrice = totalPrice.add(mealDetail.getPrice());
+                mealDetail.setDescription(meal.getDescription());
+                meals.add(mealDetail);
+            }
+            cartDetails.setTotalPrice(totalPrice);
+            cartDetails.setMeals(meals);
+        }
+
+        return ResponseEntity.ok(cartDetails);
+    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getCartById(
@@ -41,10 +84,9 @@ public class CartController {
     public ResponseEntity<?> addMealToCart(
             @PathVariable @GUID String id,
             @RequestBody @Valid CartItemRequest mealRequest) {
-        cartService.addToCart(UUID.fromString(id),
+        return ResponseEntity.ok(cartService.addToCart(UUID.fromString(id),
                 mealRequest.getProductId(),
-                mealRequest.getQuantity(),null,false );
-        return ResponseEntity.ok().build();
+                mealRequest.getQuantity(),null,true ));
     }
 
     @PostMapping("/{id}/combo")
@@ -52,12 +94,12 @@ public class CartController {
     public ResponseEntity<?> addComboToCart(
             @PathVariable @GUID String id,
             @RequestBody @Valid CartItemRequest comboRequest) {
-        cartService.addToCart(UUID.fromString(id),
+
+        return ResponseEntity.ok(cartService.addToCart(UUID.fromString(id),
                 comboRequest.getProductId(),
                 comboRequest.getInstance(),
                 comboRequest.getComponents(),
-                false );
-        return ResponseEntity.ok().build();
+                true ));
     }
 
     @PutMapping("/{id}/meal")
@@ -88,9 +130,8 @@ public class CartController {
     public ResponseEntity<?> removeItemFromCart(
             @PathVariable @GUID String id,
             @RequestBody @Valid CartItemRequest request) {
-        cartService.deleteFromCart(UUID.fromString(id),
-                request.getProductId(), request.getInstance());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(cartService.deleteFromCart(UUID.fromString(id),
+                request.getProductId(), request.getInstance()));
     }
 
     @DeleteMapping("/{id}/clear")
