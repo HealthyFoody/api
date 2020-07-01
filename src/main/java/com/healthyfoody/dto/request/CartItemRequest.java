@@ -35,7 +35,6 @@ public class CartItemRequest implements ApiRequest {
 
     @Null(groups = { OnMeals.class })
     @NotEmpty(groups = { OnCombos.class })
-    @GUID
     List<UUID> components;
     
     public CartItemRequest() { }
