@@ -10,7 +10,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.healthyfoody.entity.Address;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface AddressRepository extends JpaRepository<Address, UUID> {
 
     @Query("from Address a where a.customer.id = :customerId")

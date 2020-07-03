@@ -13,6 +13,8 @@ import com.healthyfoody.dto.response.CartResponse;
 import com.healthyfoody.dto.response.CartResponseDetails;
 import com.healthyfoody.entity.Meal;
 import com.healthyfoody.service.ProductService;
+import com.healthyfoody.util.GUIDUtil;
+import com.healthyfoody.util.GUIDWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -79,7 +81,7 @@ public class CartController {
         return ResponseEntity.ok(cartService.findById(UUID.fromString(id)));
     }
 
-    @PostMapping("/{id}/meal/")
+    @PostMapping("/{id}/meal")
     @Validated({ OnMeals.class })
     public ResponseEntity<?> addMealToCart(
             @PathVariable @GUID String id,
@@ -90,7 +92,7 @@ public class CartController {
     }
 
     @PostMapping("/{id}/combo")
-    @Validated({ Combo.class })
+    @Validated({ OnCombos.class })
     public ResponseEntity<?> addComboToCart(
             @PathVariable @GUID String id,
             @RequestBody @Valid CartItemRequest comboRequest) {
@@ -98,7 +100,7 @@ public class CartController {
         return ResponseEntity.ok(cartService.addToCart(UUID.fromString(id),
                 comboRequest.getProductId(),
                 comboRequest.getInstance(),
-                comboRequest.getComponents(),
+                GUIDWrapper.unwrap(comboRequest.getComponents()),
                 true ));
     }
 
@@ -121,7 +123,7 @@ public class CartController {
         cartService.addToCart(UUID.fromString(id),
                 comboRequest.getProductId(),
                 comboRequest.getInstance(),
-                comboRequest.getComponents(),
+                GUIDWrapper.unwrap(comboRequest.getComponents()),
                 true );
         return ResponseEntity.ok().build();
     }

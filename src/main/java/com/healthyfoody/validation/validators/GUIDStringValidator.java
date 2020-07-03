@@ -9,6 +9,9 @@ import com.healthyfoody.validation.annotations.GUID;
 public class GUIDStringValidator implements ConstraintValidator<GUID, String> {
 	@Override
 	public boolean isValid(String value, ConstraintValidatorContext context) {
-		return value.matches(GUIDUtil.PATTERN);
+		if (value == null) {
+			return true;
+		}
+		return GUIDUtil.validGUID(value);
 	}
 }

@@ -1,8 +1,12 @@
 package com.healthyfoody.controller;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
+import com.healthyfoody.dto.response.ProductResponse;
+import com.healthyfoody.entity.BaseEntity;
+import com.healthyfoody.entity.Product;
+import com.healthyfoody.exception.ResourceNotFoundException;
+import com.healthyfoody.util.GUIDWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -14,6 +18,8 @@ import com.healthyfoody.mapper.ProductMapper;
 import com.healthyfoody.service.CategoryService;
 import com.healthyfoody.service.ProductService;
 import com.healthyfoody.validation.annotations.GUID;
+
+import javax.validation.Valid;
 
 @Validated
 @RestController
@@ -47,13 +53,22 @@ public class MenuController {
 		return ResponseEntity.ok(productService.findAllByCategory(UUID.fromString(categoryId), page, size).getContent());
 	}
 
-	@GetMapping("products/{id}/combo")
-	public ResponseEntity<?> getComboDetail(
-			@PathVariable @GUID String id,
-			@RequestParam(required = false, defaultValue = "true") Boolean validDate) {
-
-		List<MealGroup> mg = productService.loadComboDetail(UUID.fromString(id),validDate);
-		return ResponseEntity.ok(productMapper.mapComboDetail(mg));
+	@GetMapping("/details/products")
+	public ResponseEntity<?> getProductsDetailed(@RequestParam UUID[] products) {
+		Set<Object> prodList = new HashSet<>();
+		Set<UUID> notFound = new HashSet<>();
+		Map<String, Object> response = new HashMap<>();
+		for (UUID id : products) {
+			try {
+				ProductResponse r = productService.findById(id);
+				prodList.add(r);
+			} catch (ResourceNotFoundException e) {
+				notFound.add(id);
+			}
+		}
+		response.put("products", prodList);
+		response.put("not_found", notFound);
+		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping("/categories/{id}")
@@ -66,5 +81,4 @@ public class MenuController {
 	public ResponseEntity<?> getProductById(@PathVariable @GUID String id) {
 		return ResponseEntity.ok(productService.findById(UUID.fromString(id)));
 	}
-
 }

@@ -1,6 +1,9 @@
 package com.healthyfoody.util;
 
-import com.healthyfoody.validation.annotations.GUID;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 
 public final class GUIDUtil {
 
@@ -8,16 +11,11 @@ public final class GUIDUtil {
     
     public static final String PATTERN = "[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}";
 
-    public static class GUIDWrapper<T> {
-        @GUID
-        T id;
+    public static boolean validGUID(UUID value) {
+        return value.toString().matches(GUIDUtil.PATTERN);
+    }
 
-        public GUIDWrapper(T id){
-            this.id = id;
-        }
-
-        public T value() {
-            return this.id;
-        }
+    public static boolean validGUID(String value) {
+        return value.matches(GUIDUtil.PATTERN);
     }
 }

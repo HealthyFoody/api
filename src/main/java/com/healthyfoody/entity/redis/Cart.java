@@ -22,6 +22,8 @@ public class Cart{
     @Id
     UUID id;
 
+    UUID customerId;
+
     @NotNull
     Boolean mutable;
 

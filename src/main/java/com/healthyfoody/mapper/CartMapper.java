@@ -16,7 +16,7 @@ import com.healthyfoody.entity.redis.CartMeal;
 @Mapper(config = SharedMapperConfig.class)
 public interface CartMapper extends ResponseMapper<CartResponse, Cart> {
 
-	@Mapping(target = "customerId", ignore = true)
+	@Mapping(target = "customerId", source = "customerId")
 	CartResponse toResponse(Cart entity);
 	
 	@Mapping(target = "name", ignore = true)

@@ -2,6 +2,7 @@ package com.healthyfoody.service.impl;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.transaction.Transactional;
@@ -39,62 +40,72 @@ public class CartServiceImpl implements CartService {
 	@Override
 	public CartResponse obtainCustomerCart(UUID customerId) {
 		Cart cart = null;
-		Customer customer = customerService.findEntityById(customerId);
-		UUID cartId = customer.getCurrentCart();
-		cart = findEntityById(cartId);
-		if (cart != null) {
-			if (!cart.getMutable())
-				cart = createCart();
-		} else {
-			cart = createCart();
-			customerService.updateActiveCart(customer, cart.getId());
+		Customer customer = null;
+
+		if (customerId != null) { //THERE IS CUSTOMER...
+			customer = customerService.findEntityById(customerId);
+			UUID cartId = customer.getCurrentCart();
+			if (cartId != null) { //...WITH CART...
+				Optional<Cart> searchResult = cartRepository.findById(cartId);
+				if (searchResult.map(Cart::getMutable).orElse(false)) {
+					//...VALID AND MUTABLE
+					cart = searchResult.get();
+				}
+			}
 		}
+		if (cart == null) {
+			cart = createCart(customerId);
+			if (customer != null) {
+				customerService.updateActiveCart(customer, cart.getId());
+			}
+		}
+
 		CartResponse response = cartMapper.toResponse(cart);
-		response.setCustomerId(customerId.toString());
 		return response;
 	}
 	
-	private Cart createCart() {
+	private Cart createCart(UUID customerId) {
 		Cart cart = new Cart();
-		return cartRepository.save(cart);
+		cart.setCustomerId(customerId);
+		return save(cart);
 	}
 
 	@Override
-	public Cart addToCart(UUID id, UUID productId, int quantityOrInstance, List<UUID> components, boolean override) {
-		CartManager cart = getCartManager(id);
+	public CartResponse addToCart(UUID id, UUID productId, int quantityOrInstance, List<UUID> components, boolean override) {
+		CartManager cartManager = getCartManager(id);
 		Product product = productService.findEntityById(productId);		
 		
-		cart.addItem(product, quantityOrInstance, components, override);
+		cartManager.addItem(product, quantityOrInstance, components, override);
 		
-		return cartRepository.save(cart.getCart());
+		Cart cart = save(cartManager.getCart());
+		CartResponse response = cartMapper.toResponse(cart);
+		return response;
 	}
 
 	@Override
-	public Cart deleteFromCart(UUID id, UUID productId, Integer instance) {
-		CartManager cart = getCartManager(id);
+	public CartResponse deleteFromCart(UUID id, UUID productId, Integer instance) {
+		CartManager cartManager = getCartManager(id);
 		Product product = productService.findEntityById(productId);	
 		
-		cart.deleteItem(product, instance);
-		
-		return cartRepository.save(cart.getCart());
+		cartManager.deleteItem(product, instance);
+
+		Cart cart = save(cartManager.getCart());
+		CartResponse response = cartMapper.toResponse(cart);
+		return response;
 	}
 
 	@Override
 	public void clearCart(UUID id) {
-		CartManager cart = getCartManager(id);
+		CartManager cartManager = getCartManager(id);
 		
-		cart.clear();
+		cartManager.clear();
 
-		cartRepository.save(cart.getCart());
+		save(cartManager.getCart());
 	}
 
 	@Override
 	public Cart findEntityById(UUID id) throws ResourceNotFoundException {
-		//return cartRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id, Cart.class));
-		if(id == null){
-			return null;
-		}
-		return cartRepository.findById(id).orElse(null);
+		return cartRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id, Cart.class));
 	}
 
 	@Transactional

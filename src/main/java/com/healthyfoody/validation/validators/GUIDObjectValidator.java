@@ -8,9 +8,12 @@ import javax.validation.ConstraintValidatorContext;
 import com.healthyfoody.util.GUIDUtil;
 import com.healthyfoody.validation.annotations.GUID;
 
-public class GUIDValidator implements ConstraintValidator<GUID, UUID> {
+public class GUIDObjectValidator implements ConstraintValidator<GUID, UUID> {
 	@Override
 	public boolean isValid(UUID value, ConstraintValidatorContext context) {
-		return value.toString().matches(GUIDUtil.PATTERN);
+		if (value == null) {
+			return true;
+		}
+		return GUIDUtil.validGUID(value);
 	}
 }
